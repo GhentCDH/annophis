@@ -8,6 +8,12 @@
 >
 > The University of Florida brings expertise in 3D digitization, digital preservation, dissemination, and advanced automatic analysis of inscriptions and historical artifacts through its Digital Epigraphy and Archaeology Project ([www.digitalepigraphy.org](http://www.digitalepigraphy.org)). The project also collaborates with the Data-Driven Humanities Research Group at the University of Florida ([https://classics.ufl.edu/data-driven-humanities-research-group/](https://classics.ufl.edu/data-driven-humanities-research-group/)), which specializes in applying Natural Language Processing and machine learning to analyze ancient Greek and Latin language, literature, and culture.
 
+## Components
+
+- [Annophis ML Hub](https://github.com/GhentCDH/annophis-mlhub) — a proxy for machine learning annotators: submit text as a LAPPS Interchange Format (LIF) document and get annotations (NER, POS, …) back from a pipeline of local or remote models.
+- [Annophis Text Service](https://github.com/GhentCDH/annophis-text-service) — a small Go HTTP service that serves CTS/CEX and plain-text collections through a modern API, with URN-based lookup of passages, ranges and excerpts.
+- [Annotation Editor](https://github.com/GhentCDH/annotation-editor) — a general, W3C Web Annotation-compliant editor: a Vue 3 component for creating and managing annotations on text sources, with a shared core library and a NestJS API module ([docs](https://ghentcdh.github.io/annotation-editor/)).
+
 ## Credits
 
 Development by [Ghent Centre for Digital Humanities - Ghent University](https://www.ghentcdh.ugent.be/). Funded by the [GhentCDH research projects](https://www.ghentcdh.ugent.be/projects).
