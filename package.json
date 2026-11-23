@@ -1,0 +1,39 @@
+{
+  "name": "@annophis/workspace",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@12.10.1",
+  "scripts": {
+    "dev": "nx run-many -t serve --parallel",
+    "build": "nx run-many -t build",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "crouton": "crouton"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@nx/eslint": "24.0.5",
+    "@nx/eslint-plugin": "24.0.5",
+    "@ghentcdh/create-crouton": "0.2.0-rc.2",
+    "@ghentcdh/crouton-cli": "0.2.0-rc.2",
+    "@ghentcdh/crouton-prisma": "0.2.0-rc.2",
+    "@nx/js": "24.0.5",
+    "@prisma/client": "^7.0.0",
+    "@prisma/client-runtime-utils": "^7.0.0",
+    "@swc/core": "1.16.22",
+    "@swc/helpers": "0.5.24",
+    "dotenv": "^18.0.10",
+    "esbuild-plugin-swc": "^1.0.0",
+    "eslint": "^10.14.0",
+    "typescript-eslint": "^8.71.0",
+    "nodemon": "^3.1.14",
+    "nx": "24.0.5",
+    "prisma": "^7.0.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.0.0",
+    "tsup": "^9.0.0",
+    "typescript": "~5.9.0",
+    "zod": "^4.0.0",
+    "zod-prisma-types": "^3.3.11"
+  }
+}
