@@ -175,6 +175,9 @@ importers:
       '@ghentcdh/crouton-cli':
         specifier: 0.2.0-rc.2
         version: 0.2.0-rc.2(supports-color@5.5.0)(typescript@5.9.3)
+      '@ghentcdh/crouton-core':
+        specifier: 0.2.0-rc.2
+        version: 0.2.0-rc.2(@jsonforms/core@3.8.0)(zod@4.6.7)
       '@ghentcdh/crouton-prisma':
         specifier: 0.2.0-rc.2
         version: 0.2.0-rc.2(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod-prisma-types@3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7))
