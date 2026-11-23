@@ -1,0 +1,24 @@
+packages:
+  - apps/gateway/*
+  - generated/gateway/**
+  - '!generated/gateway/*/client'
+  - libs/*
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
+  esbuild: true
+  nx: true
+  prisma: true
+
+minimumReleaseAge: 0
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - esbuild
+  - nx
+  - prisma
