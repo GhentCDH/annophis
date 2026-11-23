@@ -20,6 +20,21 @@ compose.yml                `docker compose up` starts everything
 - An app goes in `apps/`. Shared logic goes in `libs/`. Generated code goes in `generated/`. There is nothing else.
 - Regenerate code with `pnpm crouton update resources --project apps/<svc>`. Add `--skip-pull` to run without a DB.
 
+## Module boundaries (enforced by lint)
+
+Each project has one `scope:*` tag and one `type:*` tag. The constraints live in the root `eslint.config.mjs`.
+
+| Tag | May depend on |
+|---|---|
+| `scope:backend` | `scope:backend`, `scope:shared` (no Vue) |
+| `scope:frontend` | `scope:frontend`, `scope:shared` (no NestJS, Prisma or NATS) |
+| `scope:shared` | `scope:shared` only (framework-free: TypeScript and Zod) |
+| `type:app` | `type:lib`, `type:generated` (never another app) |
+| `type:lib` | `type:lib` only (never an app or generated code) |
+| `type:generated` | nothing |
+
+Use the `annophis-lib` skill to pick the right lib kind.
+
 ## Rules
 
 - **Service boundaries.** A service owns its Postgres schema (`?schema=<svc>`). It never reads another service's schema. Services talk to each other via REST or bus events only.
