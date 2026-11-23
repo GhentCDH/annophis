@@ -12,6 +12,7 @@ allowBuilds:
   esbuild: true
   nx: true
   prisma: true
+  '@nestjs/core': false
 
 minimumReleaseAge: 0
 

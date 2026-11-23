@@ -25,15 +25,24 @@ Hard rules:
 
 ## 2. Generate
 
-Check `pnpm nx g @nx/js:library --help` if the flags differ.
+The generator depends on the kind. All flags below were verified with Nx 24.
 
+**Backend lib (NestJS):**
+```sh
+pnpm nx g @nx/nest:library libs/<lib> --importPath=@annophis/<lib> \
+  --unitTestRunner=vitest --linter=eslint \
+  --tags=scope:backend,type:lib --no-interactive
+```
+Then delete `"module": "commonjs"` from `libs/<lib>/tsconfig.json`. It clashes with `moduleResolution: bundler` in `tsconfig.base.json` (TS5095). Backends are bundled by tsup, so the base `module: preserve` is fine.
+
+**Shared lib (framework-free):**
 ```sh
 pnpm nx g @nx/js:library libs/<lib> --importPath=@annophis/<lib> \
   --bundler=none --unitTestRunner=vitest --linter=eslint \
-  --tags=scope:<backend|frontend|shared>,type:lib --no-interactive
+  --tags=scope:shared,type:lib --no-interactive
 ```
 
-For a frontend lib with Vue components, use `@nx/vue:library` with the same `--importPath` and `--tags`.
+**Frontend lib (Vue):** use `@nx/vue:library` with the same `--importPath` and `--tags=scope:frontend,type:lib`. Install `@nx/vue` first, at the same version as `nx`.
 
 ## 3. Finish
 

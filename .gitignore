@@ -12,3 +12,5 @@ generated/gateway/*/types/*
 var/
 .nx/
 .idea/
+vitest.config.*.timestamp*
+.vitest
