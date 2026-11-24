@@ -33,7 +33,8 @@ jobs:
           pnpm install --frozen-lockfile
           for p in apps/*/crouton.json; do
             d=$(dirname "$p")
-            pnpm crouton update resources --yes --skip-pull --project "$d"
+            # generate needs some DATABASE_URL to load prisma.config.ts (no connection is made)
+            DATABASE_URL=postgresql://ci:ci@localhost:5432/ci pnpm crouton update resources --yes --skip-pull --project "$d"
             (cd "$d" && set -a && . ./.env.example && set +a && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts)
           done
           pnpm exec playwright install --with-deps chromium
