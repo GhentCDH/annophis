@@ -23,6 +23,9 @@ FROM --platform=$BUILDPLATFORM deps AS build
 ENV PRISMA_CLI_BINARY_TARGETS="linux-musl,linux-musl-arm64-openssl-3.0.x"
 
 COPY . .
+# Only this app's dependencies are installed: drop the other apps so Nx doesn't load their configs
+# (e.g. another app's vite.config.ts) while building the project graph.
+RUN find apps -mindepth 1 -maxdepth 1 ! -name gateway -exec rm -rf {} +
 
 # Generate Prisma client for Linux
 RUN cd apps/gateway && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
@@ -53,7 +56,7 @@ RUN find apps/gateway/crouton-backend/src/app/data-sources -name 'index.ts' \
     && find /app/dist/apps/gateway/crouton-backend/data-sources -name '*.ts' -delete
 
 # Transpile generated types .ts → .js
-RUN find /app/generated/gateway/default/types/src -name '*.ts' \
+RUN mkdir -p /app/generated/gateway/default/types/src && find /app/generated/gateway/default/types/src -name '*.ts' \
     | while read f; do \
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
@@ -82,10 +85,13 @@ COPY --from=build /app/generated/gateway/default/client ./generated/client
 # runtime-required data-sources resolve `@gateway/generated-default-client`.
 COPY --from=build /app/generated/gateway/default/client ./node_modules/@gateway/generated-default-client
 COPY --from=build /app/generated/gateway/default/types ./node_modules/@gateway/generated-default-types
-COPY --from=build /app/apps/gateway/crouton-frontend/dist /srv/frontend
+COPY --from=build /app/apps/gateway/crouton-frontend/dist /srv
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/gateway/crouton.json apps/gateway/crouton.enums.json ./
+# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
+COPY apps/gateway/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
+COPY apps/gateway/prisma ./prisma
 
 COPY apps/gateway/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
 COPY apps/gateway/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
@@ -93,6 +99,14 @@ RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 9000 3000
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
-
+COPY --chmod=755 <<'EOF' /usr/local/bin/annophis-start
+#!/bin/sh
+# `migrate` -> apply this app's Prisma migrations and exit; anything else -> start the app
+if [ "$1" = migrate ]; then
+  exec node /app/node_modules/prisma/build/index.js migrate deploy --config /app/prisma/default/prisma.config.ts
+fi
+/docker-entrypoint.sh true   # writes /srv/config.json + health.json
+node /app/backend/main.js &
+exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+EOF
+ENTRYPOINT ["annophis-start"]

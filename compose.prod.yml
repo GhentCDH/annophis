@@ -1,0 +1,215 @@
+# Production stack: one container per app, built by .github/workflows/docker-build.yml.
+#   cp .env.prod.example .env.prod   # fill in real secrets and URLs
+#   docker compose -f compose.prod.yml --env-file .env.prod up -d
+# Postgres and Keycloak are external (central GhentCDH Postgres, auth.ghentcdh.ugent.be). Only the gateway
+# publishes a port. Each app's `<app>-migrate` one-shot applies its Prisma migrations before the app starts.
+# Smoke test with local infra and locally built images: see README "Production images".
+
+x-backend: &backend
+  restart: unless-stopped
+  env_file:
+    - path: ${ANNOPHIS_ENV_FILE:-.env.prod}   # the smoke test uses .env.prod.example
+      required: false
+  depends_on:
+    nats: { condition: service_healthy }
+  networks: [annophis-prod]
+
+x-migrate: &migrate
+  command: [migrate]
+  restart: "no"
+  env_file:
+    - path: ${ANNOPHIS_ENV_FILE:-.env.prod}   # the smoke test uses .env.prod.example
+      required: false
+  networks: [annophis-prod]
+
+networks:
+  annophis-prod:
+    # set ANNOPHIS_NETWORK=annophis-net to run next to the dev infra (compose.infra.yml) for a smoke test
+    name: ${ANNOPHIS_NETWORK:-annophis-prod}
+
+volumes:
+  nats-data:
+
+services:
+  nats:
+    image: nats:2-alpine
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    restart: unless-stopped
+    volumes: [nats-data:/data]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [annophis-prod]
+
+  gateway-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-gateway:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${GATEWAY_DATABASE_URL}
+
+  gateway:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-gateway:${ANNOPHIS_VERSION:-latest}
+    ports: ["${ANNOPHIS_PORT:-6200}:9000"]   # Caddy: UI + /api → gateway backend
+    depends_on:
+      nats: { condition: service_healthy }
+      gateway-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: gateway
+      SERVICE_API_KEY: ${GATEWAY_API_KEY}
+      DATABASE_URL: ${GATEWAY_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+      # server-side Keycloak login: gateway only (confidential client)
+      KEYCLOAK_CLIENT_ID: ${GATEWAY_KEYCLOAK_CLIENT_ID:-annophis-gateway}
+      KEYCLOAK_CLIENT_SECRET: ${GATEWAY_KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_CALLBACK_URL: ${GATEWAY_KEYCLOAK_CALLBACK_URL}
+      CROUTON_FRONTEND_URL: ${GATEWAY_PUBLIC_URL}
+      ANNOPHIS_MS_PROJECTS_URL: http://ms-projects:3000
+      ANNOPHIS_MS_CORPORA_URL: http://ms-corpora:3000
+      ANNOPHIS_MS_ANNOTATION_URL: http://ms-annotation:3000
+      ANNOPHIS_MS_METADATA_URL: http://ms-metadata:3000
+      ANNOPHIS_TEXT_SERVICE_1_URL: http://text-service-1:3000
+      ANNOPHIS_TEXT_SERVICE_2_URL: http://text-service-2:3000
+      ANNOPHIS_ML_ADAPTER_URL: http://ml-adapter:3000
+    healthcheck:
+      # healthy = gateway + every service up and on the bus
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health/services >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  ms-projects-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-projects:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${MS_PROJECTS_DATABASE_URL}
+
+  ms-projects:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-projects:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      ms-projects-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: ms-projects
+      SERVICE_API_KEY: ${MS_PROJECTS_API_KEY}
+      DATABASE_URL: ${MS_PROJECTS_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  ms-corpora-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-corpora:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${MS_CORPORA_DATABASE_URL}
+
+  ms-corpora:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-corpora:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      ms-corpora-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: ms-corpora
+      SERVICE_API_KEY: ${MS_CORPORA_API_KEY}
+      DATABASE_URL: ${MS_CORPORA_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  ms-annotation-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-annotation:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${MS_ANNOTATION_DATABASE_URL}
+
+  ms-annotation:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-annotation:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      ms-annotation-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: ms-annotation
+      SERVICE_API_KEY: ${MS_ANNOTATION_API_KEY}
+      DATABASE_URL: ${MS_ANNOTATION_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  ms-metadata-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-metadata:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${MS_METADATA_DATABASE_URL}
+
+  ms-metadata:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ms-metadata:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      ms-metadata-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: ms-metadata
+      SERVICE_API_KEY: ${MS_METADATA_API_KEY}
+      DATABASE_URL: ${MS_METADATA_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  text-service-1-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-text-service-1:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${TEXT_SERVICE_1_DATABASE_URL}
+
+  text-service-1:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-text-service-1:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      text-service-1-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: text-service-1
+      SERVICE_API_KEY: ${TEXT_SERVICE_1_API_KEY}
+      DATABASE_URL: ${TEXT_SERVICE_1_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  text-service-2-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-text-service-2:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${TEXT_SERVICE_2_DATABASE_URL}
+
+  text-service-2:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-text-service-2:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      text-service-2-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: text-service-2
+      SERVICE_API_KEY: ${TEXT_SERVICE_2_API_KEY}
+      DATABASE_URL: ${TEXT_SERVICE_2_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000
+
+  ml-adapter-migrate:
+    <<: *migrate
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ml-adapter:${ANNOPHIS_VERSION:-latest}
+    environment:
+      DATABASE_URL: ${ML_ADAPTER_DATABASE_URL}
+
+  ml-adapter:
+    <<: *backend
+    image: ${ANNOPHIS_IMAGE_PREFIX-ghcr.io/ghentcdh/}annophis-ml-adapter:${ANNOPHIS_VERSION:-latest}
+    depends_on:
+      nats: { condition: service_healthy }
+      ml-adapter-migrate: { condition: service_completed_successfully }
+    environment:
+      SERVICE_NAME: ml-adapter
+      SERVICE_API_KEY: ${ML_ADAPTER_API_KEY}
+      DATABASE_URL: ${ML_ADAPTER_DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      BACKEND_PORT: 3000

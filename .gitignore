@@ -38,3 +38,4 @@ generated/text-service-2/*/types/*
 playwright-report/
 test-results/
 .auth/
+.env.prod

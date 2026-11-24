@@ -1,0 +1,33 @@
+# Smoke test of the production images (compose.prod.yml) with throwaway infra: Postgres and Keycloak from
+# compose.infra.yml on the prod network, no data volumes, no host ports except the gateway's.
+#   ANNOPHIS_IMAGE_PREFIX= ANNOPHIS_VERSION=test ANNOPHIS_PORT=6299 ANNOPHIS_ENV_FILE=.env.prod.example \
+#   docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example up -d --wait
+#   curl localhost:6299/api/health/services
+#   docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml down -v
+x-after-postgres: &after-postgres
+  depends_on:
+    postgres: { condition: service_healthy }
+
+services:
+  postgres:
+    extends: { file: compose.infra.yml, service: postgres }
+    ports: !reset []
+    volumes: !override
+      - ./docker/init-data:/docker-entrypoint-initdb.d:ro
+    networks: !override [annophis-prod]
+
+  keycloak:
+    extends: { file: compose.infra.yml, service: keycloak }
+    ports: !reset []
+    networks: !override
+      annophis-prod:
+        aliases: [keycloak.localhost]
+
+  gateway-migrate: *after-postgres
+  ms-projects-migrate: *after-postgres
+  ms-corpora-migrate: *after-postgres
+  ms-annotation-migrate: *after-postgres
+  ms-metadata-migrate: *after-postgres
+  text-service-1-migrate: *after-postgres
+  text-service-2-migrate: *after-postgres
+  ml-adapter-migrate: *after-postgres

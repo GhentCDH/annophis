@@ -1,0 +1,139 @@
+[%- from "base/network.j2" import network_block -%]
+[%- from "base/task.j2" import task_podman -%]
+[#-
+  Annophis on the GhentCDH Nomad cluster. Copy this folder to nomad-jobs-ns-ghentcdh/annophis/ (see
+  docs/release-to-prod.md). One group, one task per app: tasks share the group's network namespace, so every app
+  listens on its own port and the gateway reaches the services on localhost:<port>. Only the gateway (Caddy :9000,
+  UI + /api) is published through the Nomad load balancer.
+-#]
+
+job "[[ job_name ]]" {
+  type      = "service"
+  namespace = "ghentcdh"
+
+  vault {}
+
+  update {
+    stagger      = "30s"
+    max_parallel = 1
+  }
+
+  group "annophis" {
+    [[ network_block(network="private", ports={"http": {"to": 9000}}) ]]
+
+    # ---- infrastructure inside the group ------------------------------------------------------------------
+    task "nats" {
+      driver = "podman"
+      lifecycle {
+        hook    = "prestart"
+        sidecar = true
+      }
+      config {
+        image      = "[[ resolve_image(defs.image_base ~ '/library/nats:2-alpine') ]]"
+        args       = ["-js", "-sd", "/data", "-m", "8222", "-a", "127.0.0.1"]
+        force_pull = true
+        # TODO: JetStream storage on a CSI or host volume (see volumes/ in nomad-jobs-ns-ghentcdh)
+      }
+      resources {
+        cpu    = 200
+        memory = 256
+      }
+    }
+
+    # ---- migrations: one prestart task per app, before the apps start --------------------------------------
+    [%- for app in apps %]
+    task "[[ app.name ]]-migrate" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+      driver = "podman"
+      config {
+        image      = "[[ resolve_image(app.image) ]]"
+        args       = ["migrate"]   # the image's entrypoint runs `prisma migrate deploy` and exits
+        force_pull = true
+      }
+      resources {
+        memory = 256
+      }
+      template {
+        destination = "local/env"
+        env         = true
+        change_mode = "noop"
+        data        = <<EOH
+        {{ with secret "kv_nomad/ghentcdh/annophis" }}DATABASE_URL={{ index .Data.data "[[ app.env ]]_DATABASE_URL" }}{{ end }}
+        EOH
+      }
+    }
+    [%- endfor %]
+
+    # ---- the apps ----------------------------------------------------------------------------------------------
+    [%- for app in apps %]
+    task "[[ app.name ]]" {
+      [[ task_podman(image=app.image, memory=app.memory, ports=(["http"] if app.name == "gateway" else [])) ]]
+
+      template {
+        destination = "local/env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+        SERVICE_NAME=[[ app.name ]]
+        BACKEND_PORT=[[ app.port ]]
+        NATS_URL=nats://127.0.0.1:4222
+        ENVIRONMENT=[[ defs.environment ]]
+        {{ with secret "kv_nomad/ghentcdh/annophis" }}
+        DATABASE_URL={{ index .Data.data "[[ app.env ]]_DATABASE_URL" }}
+        SERVICE_API_KEY={{ index .Data.data "[[ app.env ]]_API_KEY" }}
+        SERVICE_API_KEYS={{ .Data.data.SERVICE_API_KEYS }}
+        SERVICE_AUTH=on
+        CROUTON_AUTH_SECRET={{ .Data.data.CROUTON_AUTH_SECRET }}
+        INTERNAL_JWT_SECRET={{ .Data.data.INTERNAL_JWT_SECRET }}
+        KEYCLOAK_URL={{ .Data.data.KEYCLOAK_URL }}
+        KEYCLOAK_REALM={{ .Data.data.KEYCLOAK_REALM }}
+        [%- if app.name == "gateway" %]
+        KEYCLOAK_CLIENT_ID=annophis-gateway
+        KEYCLOAK_CLIENT_SECRET={{ .Data.data.GATEWAY_KEYCLOAK_CLIENT_SECRET }}
+        KEYCLOAK_CALLBACK_URL=https://[[ fqdn ]]/api/_app/auth/keycloak/callback
+        CROUTON_FRONTEND_URL=https://[[ fqdn ]]
+        [%- for svc in apps if svc.name != "gateway" %]
+        ANNOPHIS_[[ svc.env ]]_URL=http://127.0.0.1:[[ svc.port ]]
+        [%- endfor %]
+        [%- else %]
+        KEYCLOAK_CLIENT_ID=annophis-ui
+        [%- endif %]
+        {{ end }}
+        EOH
+      }
+      [%- if app.name == "gateway" %]
+
+      service {
+        provider     = "consul"
+        address_mode = "host"
+        name         = "ghentcdh-annophis-[[ defs.environment ]]"
+        port         = "http"
+        tags         = ["nomad-lb"]
+
+        meta {
+          nomad-lb-alloc-id    = "${NOMAD_SHORT_ALLOC_ID}"
+          nomad-lb-vhost-fqdn  = "[[ fqdn ]]"
+          nomad-lb-vhost-proto = "http"
+          nomad-lb-vhost-uri   = "/"
+        }
+
+        check {
+          # 200 only when the gateway and every service are up and on the bus
+          name                     = "Stack health"
+          type                     = "http"
+          port                     = "http"
+          path                     = "/api/health/services"
+          interval                 = "30s"
+          timeout                  = "5s"
+          success_before_passing   = 2
+          failures_before_critical = 3
+        }
+      }
+      [%- endif %]
+    }
+    [%- endfor %]
+  }
+}
