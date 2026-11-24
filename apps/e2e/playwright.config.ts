@@ -11,7 +11,7 @@ export default defineConfig({
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['html', { open: 'never' }], ['github']] : 'list',
   use: {
-    baseURL: process.env['GATEWAY_URL'] ?? 'http://localhost:4200',
+    baseURL: process.env['GATEWAY_URL'] ?? 'http://localhost:6200',
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

@@ -9,7 +9,7 @@ description: Write or run Annophis end-to-end tests (Playwright, apps/e2e) again
 
 - **Run:** start the stack (`docker compose up`), then `pnpm nx e2e e2e`. For one spec: `cd apps/e2e && pnpm exec playwright test health.spec.ts`. First time: `pnpm exec playwright install chromium`.
 - **Targets:**
-  - `baseURL` is the gateway UI: `GATEWAY_URL`, default `http://localhost:4200`.
+  - `baseURL` is the gateway UI: `GATEWAY_URL`, default `http://localhost:6200`.
   - Service backends come from `src/services.ts`: ports from `AGENTS.md`, overridable with `E2E_<SVC>_URL`.
 - **No `webServer`.** The tests expect the stack to be running. Never start services from a test.
 - **Specs** go in `apps/e2e/src/<area>.spec.ts`. Use `request` for API checks and `page` for UI.
