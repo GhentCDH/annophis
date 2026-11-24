@@ -13,6 +13,9 @@ export const adminServices = [
   { name: 'ml-adapter', title: 'ML adapter', port: 6120 },
 ] as const;
 
-/** Backend URL of a service: its compose hostname inside Docker, localhost otherwise. */
+/**
+ * Backend URL of a service: `ANNOPHIS_<NAME>_URL` (e.g. ANNOPHIS_MS_PROJECTS_URL, set by compose / Nomad),
+ * else `http://localhost:<port>` for `pnpm dev`.
+ */
 export const serviceUrl = ({ name, port }: { name: string; port: number }) =>
-  `http://${process.env['IS_DOCKER'] ? `${name}-backend` : 'localhost'}:${port}`;
+  process.env[`ANNOPHIS_${name.toUpperCase().replace(/-/g, '_')}_URL`] ?? `http://localhost:${port}`;

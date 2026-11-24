@@ -11,3 +11,11 @@ test.describe('service health', () => {
     });
   }
 });
+
+test('the gateway reports the whole stack healthy', async ({ request }) => {
+  const res = await request.get('/api/health/services');
+  expect(res.status()).toBe(200);
+  const body = await res.json();
+  expect(body.status).toBe('ok');
+  expect(body.services).toHaveLength(services.length);
+});

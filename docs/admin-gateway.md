@@ -81,6 +81,12 @@ sequenceDiagram
 
 A service that is down is skipped, with a warning in the gateway log.
 
+Service URLs come from `ANNOPHIS_<SVC>_URL` (e.g. `ANNOPHIS_MS_PROJECTS_URL`), falling back to `http://localhost:<port>` for `pnpm dev`.
+
+## Health of the whole stack
+
+`GET /api/health/services` (public) calls the gateway and every service's `/health`. It returns `{ status: 'ok' | 'degraded', services: [...] }`: HTTP 200 when everything is up and on the bus, 503 otherwise. Compose and Nomad use it as the gateway's health check.
+
 ## Opening and editing a resource
 
 ```mermaid

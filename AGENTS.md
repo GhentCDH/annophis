@@ -56,7 +56,8 @@ Use the `annophis-lib` skill to pick the right lib kind.
   - `GET /_app/layout` merges the gateway's sidebar with one group per service. Leaf ids become `<svc>.<id>` and routes `<svc>/<route>` (`merge-layouts.ts`); services are listed only for admins.
   - `/<svc>/*` is reverse-proxied to that service with the prefix stripped and `Authorization` forwarded.
   - Each service sets `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir`, so its CRUD/relation URIs carry the prefix.
-  - The service list (name, sidebar title, port) lives in `apps/gateway/crouton-backend/src/services.ts`.
+  - The service list (name, sidebar title, port) lives in `apps/gateway/crouton-backend/src/services.ts`. URLs come from `ANNOPHIS_<SVC>_URL`, else `localhost:<port>`.
+  - `GET /health/services` gives the health of the whole stack (503 when any service is down or off the bus).
 - **Not public:** admin writes go straight to the database (events come from the Prisma extension, not controllers), so never expose the admin UIs publicly.
 - **Keycloak hostname:** `KEYCLOAK_URL=http://keycloak.localhost:6480` everywhere. `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer is the same for all of them.
 
