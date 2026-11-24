@@ -1,11 +1,11 @@
 import { Inject, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
-import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import type { CanActivate, CustomDecorator, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { jwtVerify } from 'jose';
 
 const PUBLIC = 'annophis:public';
 /** Marks a route as reachable without service auth (e.g. /health). */
-export const Public = () => SetMetadata(PUBLIC, true);
+export const Public = (): CustomDecorator<string> => SetMetadata(PUBLIC, true);
 
 export const INTERNAL_JWT_ISSUER = 'annophis-gateway';
 
