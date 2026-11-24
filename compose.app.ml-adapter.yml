@@ -9,7 +9,7 @@ services:
       dockerfile: apps/ml-adapter/Dockerfile.dev
     env_file: [apps/ml-adapter/.env]
     ports:
-      - "${BACKEND_PORT:-3020}:${BACKEND_PORT:-3020}"
+      - "${BACKEND_PORT:-6120}:${BACKEND_PORT:-6120}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/ml-adapter; pnpm exec nx run ml-adapter-backend:serve"
     depends_on:

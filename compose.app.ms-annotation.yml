@@ -9,7 +9,7 @@ services:
       dockerfile: apps/ms-annotation/Dockerfile.dev
     env_file: [apps/ms-annotation/.env]
     ports:
-      - "${FRONTEND_PORT:-4203}:${FRONTEND_PORT:-4203}"
+      - "${FRONTEND_PORT:-6203}:${FRONTEND_PORT:-6203}"
     environment:
       - BACKEND_HOST=ms-annotation-backend
       - NX_COMMAND=ms-annotation-frontend:dev
@@ -26,7 +26,7 @@ services:
       dockerfile: apps/ms-annotation/Dockerfile.dev
     env_file: [apps/ms-annotation/.env]
     ports:
-      - "${BACKEND_PORT:-3003}:${BACKEND_PORT:-3003}"
+      - "${BACKEND_PORT:-6103}:${BACKEND_PORT:-6103}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-annotation; pnpm exec nx run ms-annotation-backend:serve"
     depends_on:

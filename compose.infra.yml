@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: annophis
       POSTGRES_PASSWORD: annophis
       POSTGRES_DB: annophis
-    ports: ["5442:5432"]
+    ports: ["6432:5432"]  # Annophis infra range 6400–6499 (see AGENTS.md)
     volumes:
       - ./var/pgdata:/var/lib/postgresql/data
       # one user + schema per service; runs only on an empty volume (rm -rf var/pgdata to re-run)
@@ -26,7 +26,7 @@ services:
   nats:
     image: nats:2-alpine
     command: ["-js", "-sd", "/data", "-m", "8222"]
-    ports: ["4222:4222", "8222:8222"]
+    ports: ["6422:4222", "6482:8222"]
     volumes: ["./var/nats:/data"]
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
@@ -42,7 +42,8 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: "true"
-    ports: ["8080:8080"]
+      KC_HTTP_PORT: "6480"  # same port inside and outside, so the issuer URL works for browser and containers
+    ports: ["6480:6480"]
     volumes:
       # No data volume: the realm is imported from the committed JSON on every start (a root-owned bind
       # mount is not writable for the keycloak user on Linux). Export console changes to the JSON (README).

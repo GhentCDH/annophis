@@ -68,18 +68,33 @@ Contract, event and service-auth skills arrive together with those libs.
 
 ## Ports
 
+Annophis owns fixed port ranges so it can run next to other local projects (which use 3000/4200/5432/8080 and friends). **Always pick new ports inside these ranges and keep the suffix per service the same across ranges.**
+
+| Range | Use |
+|---|---|
+| 6100–6199 | service backends (`BACKEND_PORT`) |
+| 6200–6299 | service admin frontends (`FRONTEND_PORT`), same suffix as the backend |
+| 6400–6499 | infra host ports |
+
 | Service | Backend | Frontend |
 |---|---|---|
-| gateway | 3000 | 4200 |
-| ms-projects | 3001 | 4201 |
-| ms-corpora | 3002 | 4202 |
-| ms-annotation | 3003 | 4203 |
-| ms-metadata | 3004 | 4204 |
-| text-service-1 | 3010 | 4210 |
-| text-service-2 | 3011 | 4211 |
-| ml-adapter | 3020 | none (API only) |
+| gateway | 6100 | 6200 |
+| ms-projects | 6101 | 6201 |
+| ms-corpora | 6102 | 6202 |
+| ms-annotation | 6103 | 6203 |
+| ms-metadata | 6104 | 6204 |
+| text-service-1 | 6110 | 6210 |
+| text-service-2 | 6111 | 6211 |
+| ml-adapter | 6120 | none (API only) |
 
-Infra (`compose.infra.yml`): Postgres `5442` (DB `annophis`), NATS `4222` (monitoring `8222`), Keycloak `8080` (realm `annophis`).
+| Infra | Host port | Inside Docker |
+|---|---|---|
+| Postgres (DB `annophis`) | 6432 | `postgres:5432` |
+| NATS | 6422 | `nats:4222` |
+| NATS monitoring | 6482 | `nats:8222` |
+| Keycloak (realm `annophis`) | 6480 | `keycloak.localhost:6480` (same port inside and out) |
+
+The next free suffixes are `x05`–`x09` for domain `ms-*` services, `x12`+ for text services and `x21`+ for adapters.
 
 Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name (password `dev`). `docker/init-data/01-schemas.sql` creates them. Inside Docker, the compose files override `DATABASE_URL` and `NATS_URL` to use the `postgres` and `nats` hosts; `.env` uses `localhost` for `pnpm dev`.
 

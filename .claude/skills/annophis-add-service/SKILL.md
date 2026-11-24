@@ -5,7 +5,7 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
 
 # Add a service
 
-`<svc>` is kebab-case (e.g. `ms-projects`). `<svc_u>` is the same name with `_` instead of `-` (Postgres user and schema). Take free ports from the Ports table in `AGENTS.md`.
+`<svc>` is kebab-case (e.g. `ms-projects`). `<svc_u>` is the same name with `_` instead of `-` (Postgres user and schema). Take ports from the Annophis ranges in `AGENTS.md` (backend 61xx, frontend 62xx, same suffix). Never use ports outside the ranges.
 
 1. Scaffold with the layout flags. Never move folders by hand afterwards.
    ```sh
@@ -13,7 +13,7 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
      --apps-dir apps/<svc> --backend-dir crouton-backend --frontend-dir crouton-frontend \
      --generated-dir generated/<svc> \
      --frontend --frontend-port <fport> --backend-port <bport> \
-     --db-url "postgresql://<svc_u>:dev@localhost:5442/annophis?schema=<svc_u>" -y
+     --db-url "postgresql://<svc_u>:dev@localhost:6432/annophis?schema=<svc_u>" -y
    ```
    - For an API-only service, use `--no-frontend` without `--frontend-port`, then delete `FRONTEND_PORT` from its `.env` and `.env.example`.
    - In zsh, pass flags held in a variable as an array, otherwise they are not split.
@@ -24,7 +24,7 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
 3. Append to `apps/<svc>/.env` and `.env.example`:
    ```
    SERVICE_NAME=<svc>
-   NATS_URL=nats://localhost:4222
+   NATS_URL=nats://localhost:6422
    SERVICE_AUTH=off
    SERVICE_API_KEYS=dev-key-<svc>
    INTERNAL_JWT_SECRET=dev-only-change-me

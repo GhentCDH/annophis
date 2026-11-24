@@ -9,7 +9,7 @@ services:
       dockerfile: apps/ms-corpora/Dockerfile.dev
     env_file: [apps/ms-corpora/.env]
     ports:
-      - "${FRONTEND_PORT:-4202}:${FRONTEND_PORT:-4202}"
+      - "${FRONTEND_PORT:-6202}:${FRONTEND_PORT:-6202}"
     environment:
       - BACKEND_HOST=ms-corpora-backend
       - NX_COMMAND=ms-corpora-frontend:dev
@@ -26,7 +26,7 @@ services:
       dockerfile: apps/ms-corpora/Dockerfile.dev
     env_file: [apps/ms-corpora/.env]
     ports:
-      - "${BACKEND_PORT:-3002}:${BACKEND_PORT:-3002}"
+      - "${BACKEND_PORT:-6102}:${BACKEND_PORT:-6102}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-corpora; pnpm exec nx run ms-corpora-backend:serve"
     depends_on:

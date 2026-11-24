@@ -9,7 +9,7 @@ services:
       dockerfile: apps/gateway/Dockerfile.dev
     env_file: [apps/gateway/.env]
     ports:
-      - "${FRONTEND_PORT:-4200}:${FRONTEND_PORT:-4200}"
+      - "${FRONTEND_PORT:-6200}:${FRONTEND_PORT:-6200}"
     environment:
       - BACKEND_HOST=gateway-backend
       - NX_COMMAND=gateway-frontend:dev
@@ -26,7 +26,7 @@ services:
       dockerfile: apps/gateway/Dockerfile.dev
     env_file: [apps/gateway/.env]
     ports:
-      - "${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}"
+      - "${BACKEND_PORT:-6100}:${BACKEND_PORT:-6100}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/gateway; pnpm exec nx run gateway-backend:serve"
     depends_on:

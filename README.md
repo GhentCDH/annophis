@@ -29,13 +29,15 @@ pnpm install
 docker compose up            # Postgres, NATS, Keycloak and every service (dev mode, hot reload)
 ```
 
+Annophis only uses ports 6100–6499 (see the Ports section in [AGENTS.md](AGENTS.md)), so it runs next to other local stacks.
+
 | What | URL |
 |---|---|
-| Gateway UI | http://localhost:4200 |
-| Service backends | http://localhost:3000 (gateway), 3001–3004 (`ms-*`), 3010/3011 (text services), 3020 (ml-adapter) |
-| Keycloak | http://localhost:8080 (console `admin`/`admin`; realm `annophis`, users `admin`/`admin`, `viewer`/`viewer`) |
-| NATS monitoring | http://localhost:8222 |
-| Postgres | `localhost:5442`, database `annophis`, one schema + user per service (password `dev`) |
+| Gateway UI | http://localhost:6200 |
+| Service backends | http://localhost:6100 (gateway), 6101–6104 (`ms-*`), 6110/6111 (text services), 6120 (ml-adapter); admin frontends on the same suffix in 6200–6299 |
+| Keycloak | http://localhost:6480 (console `admin`/`admin`; realm `annophis`, users `admin`/`admin`, `viewer`/`viewer`) |
+| NATS monitoring | http://localhost:6482 |
+| Postgres | `localhost:6432`, database `annophis`, one schema + user per service (password `dev`) |
 
 To run infra in Docker and the apps on the host: `docker compose up postgres nats keycloak`, then `pnpm dev`.
 
