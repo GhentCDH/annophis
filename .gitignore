@@ -11,3 +11,6 @@ generated/gateway/*/types/*
 *.tsbuildinfo
 var/
 .nx/
+.idea/
+vitest.config.*.timestamp*
+.vitest

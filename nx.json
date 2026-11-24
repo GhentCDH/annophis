@@ -1,19 +1,30 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": ["default"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json"
+    ],
     "sharedGlobals": []
   },
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
-      "options": { "targetName": "lint" }
+      "options": {
+        "targetName": "lint"
+      }
     },
     {
       "plugin": "@nx/js/typescript",
       "options": {
-        "typecheck": { "targetName": "typecheck" },
+        "typecheck": {
+          "targetName": "typecheck"
+        },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -21,11 +32,28 @@
           "watchDepsName": "watch-deps"
         }
       }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test",
+        "ciTargetName": "test-ci",
+        "testMode": "watch"
+      }
     }
   ],
   "release": {
-    "projects": ["*"],
-    "version": { "conventionalCommits": true }
+    "projects": [
+      "*"
+    ],
+    "version": {
+      "conventionalCommits": true
+    }
   },
-  "neverConnectToCloud": true
+  "neverConnectToCloud": true,
+  "sync": {
+    "disabledTaskSyncGenerators": [
+      "@nx/js:typescript-sync"
+    ]
+  }
 }

@@ -4,7 +4,9 @@
     "declarationMap": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "preserve",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -16,10 +18,18 @@
     "target": "es2022",
     "baseUrl": ".",
     "paths": {
-      "@annophis/generated-default-types": ["./generated/gateway/default/types/src"],
-      "@annophis/generated-default-types/*": ["./generated/gateway/default/types/src/*"],
-      "@annophis/generated-default-client": ["./generated/gateway/default/client"],
-      "@annophis/generated-default-client/*": ["./generated/gateway/default/client/*"]
+      "@annophis/generated-default-types": [
+        "./generated/gateway/default/types/src"
+      ],
+      "@annophis/generated-default-types/*": [
+        "./generated/gateway/default/types/src/*"
+      ],
+      "@annophis/generated-default-client": [
+        "./generated/gateway/default/client"
+      ],
+      "@annophis/generated-default-client/*": [
+        "./generated/gateway/default/client/*"
+      ]
     }
   }
 }

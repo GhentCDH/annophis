@@ -10,5 +10,11 @@
   "dependencies": {
     "tslib": "^2.9.1",
     "zod": "^4.0.0"
+  },
+  "nx": {
+    "tags": [
+      "scope:shared",
+      "type:generated"
+    ]
   }
 }

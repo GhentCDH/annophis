@@ -4,7 +4,8 @@
   "projectType": "application",
   "sourceRoot": "apps/gateway/crouton-frontend/src",
   "tags": [
-    "scope:frontend"
+    "scope:frontend",
+    "type:app"
   ],
   "targets": {
     "typecheck": {
