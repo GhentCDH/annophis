@@ -1,6 +1,25 @@
 {
   "mcpServers": {
-    "nx-mcp": { "command": "npx", "args": ["-y", "nx-mcp@0.25.4"] },
-    "prisma": { "command": "pnpm", "args": ["exec", "prisma", "mcp"] }
+    "nx-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "nx-mcp@0.25.4"
+      ]
+    },
+    "prisma": {
+      "command": "pnpm",
+      "args": [
+        "exec",
+        "prisma",
+        "mcp"
+      ]
+    },
+    "auto": {
+      "command": "auto",
+      "args": [
+        "mcp"
+      ]
+    }
   }
 }

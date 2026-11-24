@@ -71,6 +71,14 @@ docker compose up
 pnpm nx e2e e2e      # Playwright, against the running stack
 ```
 
+## MCP servers (`.mcp.json`)
+
+| Server | What for | Needs |
+|---|---|---|
+| `nx-mcp` | workspace graph, projects, targets, generators | nothing (runs via `npx`) |
+| `prisma` | migrations and schema of a service's database | `pnpm install` |
+| `auto` | GhentCDH IT inventory: where Annophis runs, domains, healthchecks, Nomad/Caddy deploy config | the `auto` binary (`curl -fsSL https://raw.githubusercontent.com/GhentCDH/auto/main/scripts/install.sh \| sh`), then `auto login --url <server>` and `auto token create "claude" --save` |
+
 ## Skills (`.claude/skills/`)
 
 Plain markdown; any agent can read them.
