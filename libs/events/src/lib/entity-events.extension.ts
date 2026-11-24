@@ -1,18 +1,4 @@
-import { Logger } from '@nestjs/common';
-
-import type { EventBus } from './event-bus';
-
-const log = new Logger('EntityEvents');
-
-type Publisher = Pick<EventBus, 'publish'>;
-// On globalThis, not module scope: in production builds the data source (which applies the extension) is bundled
-// separately from main.js (which runs EventBus), so this module exists twice and module state would not be shared.
-const KEY = Symbol.for('annophis.entityEventPublisher');
-const registry = globalThis as typeof globalThis & { [KEY]?: Publisher };
-/** Called by EventBus once connected; the Prisma client lives outside Nest DI. */
-export const setEntityEventPublisher = (p: Publisher | undefined) => {
-  registry[KEY] = p;
-};
+import { randomUUID } from 'node:crypto';
 
 const VERBS: Record<string, 'created' | 'updated' | 'deleted'> = {
   create: 'created',
@@ -26,71 +12,75 @@ const VERBS: Record<string, 'created' | 'updated' | 'deleted'> = {
   deleteMany: 'deleted',
 };
 
-type Row = Record<string, unknown> & { id?: unknown };
-type OperationParams = {
-  model?: string;
-  operation: string;
-  args: unknown;
-  query: (args: unknown) => Promise<unknown>;
+/** The outbox model every service's Prisma schema has (see `model Outbox`); never itself evented. */
+export const OUTBOX_MODEL = 'Outbox';
+
+export type OutboxRow = {
+  id: string;
+  type: string;
+  subject: string | null;
+  data: unknown;
+  createdAt: Date;
+  publishedAt: Date | null;
 };
+
+type Row = Record<string, unknown> & { id?: unknown };
+type Delegate = Record<string, (args: unknown) => Promise<unknown>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyClient = any;
 
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+/** Prisma Json columns take plain JSON: Dates become ISO strings, like on the bus. */
+const toJson = (v: unknown) => JSON.parse(JSON.stringify(v ?? null)) as unknown;
 
 /**
- * Prisma client extension: after every successful write, publish `<service>.<model>.<created|updated|deleted>`
- * on the bus (data = the written row, subject = its id). Because crouton's admin CRUD goes through the same
- * client, admin writes emit events too — never publish entity events from controllers.
- *
- * Bulk writes without returned rows (createMany/updateMany/deleteMany) publish one event with `{ count, where }`.
- *
- * ponytail: fire-and-forget after the query returns. Inside an interactive transaction the event may precede the
- * commit (or survive a rollback), and a NATS outage drops the event (logged). Upgrade path: a transactional outbox.
+ * The outbox rows for one write: `<service>.<model>.<created|updated|deleted>`, data = the written row, subject = its
+ * id. Bulk writes without returned rows (createMany/updateMany/deleteMany) give one row with `{ count, where }`.
  */
-// Prisma's $allOperations params are generic per client; the extension is model-agnostic, so the exported
-// signature takes `any` (validated structurally inside) to be assignable to every generated client's $extends.
-type AnyOperation = {
-  name: string;
-  query: {
-    $allModels: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      $allOperations: (params: any) => Promise<unknown>;
-    };
-  };
+export const outboxRowsFor = (service: string, model: string, operation: string, args: unknown, result: unknown) => {
+  const verb = VERBS[operation];
+  if (!verb) return [];
+  const type = `${service}.${lowerFirst(model)}.${verb}`;
+  const rows: Row[] = Array.isArray(result) ? result : 'count' in Object(result) ? [] : [result as Row];
+  const events =
+    rows.length > 0
+      ? rows.map((row) => ({ data: row, subject: row.id == null ? null : String(row.id) }))
+      : [{ data: { count: (result as { count?: number }).count, where: (args as { where?: unknown })?.where }, subject: null }];
+  return events.map(({ data, subject }) => ({ id: randomUUID(), type, subject, data: toJson(data) }));
 };
 
-export const entityEvents = (service: string): AnyOperation => ({
-  name: 'annophis-entity-events',
-  query: {
-    $allModels: {
-      async $allOperations({ model, operation, args, query }: OperationParams) {
-        const result = await query(args);
-        const verb = VERBS[operation];
-        if (!verb || !model) return result;
-
-        const type = `${service}.${lowerFirst(model)}.${verb}`;
-        const rows: Row[] = Array.isArray(result) ? result : 'count' in Object(result) ? [] : [result as Row];
-        const events =
-          rows.length > 0
-            ? rows.map((row) => ({ data: row, subject: row.id == null ? undefined : String(row.id) }))
-            : [{ data: { count: (result as { count?: number }).count, where: (args as { where?: unknown })?.where }, subject: undefined }];
-
-        const activePublisher = registry[KEY];
-        if (!activePublisher) {
-          log.warn(`${type}: no EventBus connected, event dropped`);
-          return result;
-        }
-        for (const { data, subject } of events) {
-          activePublisher.publish(type, data, subject).catch((e) => log.error(`${type}: publish failed`, e));
-        }
-        return result;
-      },
-    },
-  },
-});
+const OUTBOX_STORE = Symbol.for('annophis.outboxStore');
+type Registry = typeof globalThis & { [OUTBOX_STORE]?: { service: string; client: AnyClient } };
+/**
+ * The OutboxRelay (Nest) finds the service's Prisma client here: crouton builds the client in the data source,
+ * outside Nest DI, and in production the data source is bundled separately from main.js — hence globalThis.
+ */
+export const getOutboxStore = () => (globalThis as Registry)[OUTBOX_STORE];
 
 /**
- * `withEntityEvents(new PrismaClient({ adapter }), 'ms-projects')`. The extension only hooks queries and adds no API,
- * so the client keeps its own type (Prisma's `$extends` typing is specific to every generated client).
+ * `withEntityEvents(new PrismaClient({ adapter }), 'ms-projects')`: every write runs in a transaction together with
+ * its outbox row(s), so an event is stored if and only if the change is committed. The OutboxRelay publishes them.
+ * Crouton's admin CRUD goes through the same client, so admin writes produce events too.
+ *
+ * Caveat: a write inside a caller's own interactive transaction (`$transaction(async tx => …)`) opens a separate
+ * transaction for itself, so it is not atomic with the caller's other statements.
  */
-export const withEntityEvents = <C extends { $extends: (extension: never) => unknown }>(client: C, service: string): C =>
-  client.$extends(entityEvents(service) as never) as C;
+export const withEntityEvents = <C extends { $extends: (extension: never) => unknown }>(client: C, service: string): C => {
+  const base = client as AnyClient;
+  (globalThis as Registry)[OUTBOX_STORE] = { service, client: base };
+  return base.$extends({
+    name: 'annophis-entity-events',
+    query: {
+      $allModels: {
+        async $allOperations({ model, operation, args, query }: { model?: string; operation: string; args: unknown; query: (a: unknown) => Promise<unknown> }) {
+          if (!model || model === OUTBOX_MODEL || !VERBS[operation]) return query(args);
+          return base.$transaction(async (tx: AnyClient) => {
+            const result = await (tx[lowerFirst(model)] as Delegate)[operation](args);
+            await tx.outbox.createMany({ data: outboxRowsFor(service, model, operation, args, result) });
+            return result;
+          });
+        },
+      },
+    },
+  }) as C;
+};

@@ -7,5 +7,8 @@
   "generatedTypesImport": "@ms-annotation/generated-default-types",
   "zodOutput": "../../generated/ms-annotation/default/types/src",
   "clientOutput": "../../generated/ms-annotation/default/client",
-  "prismaConfig": "prisma/default/prisma.config.ts"
+  "prismaConfig": "prisma/default/prisma.config.ts",
+  "excludeTables": [
+    "outbox"
+  ]
 }

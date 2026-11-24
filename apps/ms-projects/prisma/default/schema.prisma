@@ -23,3 +23,17 @@ model Project {
 
   @@map("project")
 }
+
+/// Transactional outbox: written in the same transaction as the entity change (withEntityEvents in
+/// @annophis/events), published to NATS by the OutboxRelay. Internal: excluded from crouton (data-source.json).
+model Outbox {
+  id          String    @id @db.Uuid
+  type        String
+  subject     String?
+  data        Json
+  createdAt   DateTime  @default(now()) @map("created_at")
+  publishedAt DateTime? @map("published_at")
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox")
+}

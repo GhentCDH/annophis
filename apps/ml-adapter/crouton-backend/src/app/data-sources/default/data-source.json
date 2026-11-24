@@ -7,5 +7,8 @@
   "generatedTypesImport": "@ml-adapter/generated-default-types",
   "zodOutput": "../../generated/ml-adapter/default/types/src",
   "clientOutput": "../../generated/ml-adapter/default/client",
-  "prismaConfig": "prisma/default/prisma.config.ts"
+  "prismaConfig": "prisma/default/prisma.config.ts",
+  "excludeTables": [
+    "outbox"
+  ]
 }

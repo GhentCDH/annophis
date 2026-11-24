@@ -6,7 +6,6 @@ import { connect } from '@nats-io/transport-node';
 import type { NatsConnection } from '@nats-io/transport-node';
 import { randomUUID } from 'node:crypto';
 
-import { setEntityEventPublisher } from './entity-events.extension';
 
 export const EVENTS_OPTIONS = Symbol('EVENTS_OPTIONS');
 export type EventsOptions = { service: string; servers?: string };
@@ -40,7 +39,6 @@ export class EventBus implements OnModuleInit, OnModuleDestroy {
       .info(STREAM)
       .catch(() => this.jsm.streams.add({ name: STREAM, subjects: ['annophis.>'] }));
     this.js = jetstream(this.nc);
-    setEntityEventPublisher(this);
   }
 
   isConnected = () => !!this.nc && !this.nc.isClosed();
@@ -56,8 +54,13 @@ export class EventBus implements OnModuleInit, OnModuleDestroy {
       dataVersion: '1',
       data,
     };
-    await this.js.publish(`annophis.${type}`, JSON.stringify(env), { msgID: env.id });
+    await this.publishEnvelope(env);
     return env;
+  };
+
+  /** Publishes a ready-made envelope (e.g. from the outbox): same id → JetStream drops duplicates (msgID). */
+  publishEnvelope = async (env: EventEnvelope) => {
+    await this.js.publish(`annophis.${env.type}`, JSON.stringify(env), { msgID: env.id });
   };
 
   /**
@@ -87,7 +90,6 @@ export class EventBus implements OnModuleInit, OnModuleDestroy {
   };
 
   async onModuleDestroy() {
-    setEntityEventPublisher(undefined);
     await this.nc?.drain();
   }
 }

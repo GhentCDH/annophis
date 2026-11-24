@@ -7,5 +7,8 @@
   "generatedTypesImport": "@text-service-2/generated-default-types",
   "zodOutput": "../../generated/text-service-2/default/types/src",
   "clientOutput": "../../generated/text-service-2/default/client",
-  "prismaConfig": "prisma/default/prisma.config.ts"
+  "prismaConfig": "prisma/default/prisma.config.ts",
+  "excludeTables": [
+    "outbox"
+  ]
 }

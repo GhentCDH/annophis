@@ -16,9 +16,11 @@ The `EventBus` (`@annophis/events`) is provided by `AnnophisServiceModule`. Inje
   - **Handlers must be idempotent.** A throw means NAK and redelivery. Dedupe on `event.id` when the side effect is not idempotent.
   - Validate input with the contract schema: `X.parse(event)`.
 - **Entity events:** every data source wraps its client with `withEntityEvents(new PrismaClient({ adapter }), '<svc>')` in `data-sources/default/index.ts`.
-  - Every write publishes `<svc>.<model>.<created|updated|deleted>`, with data = the row and subject = its id. Bulk writes without returned rows publish `{ count, where }`.
+  - Every write stores `<svc>.<model>.<created|updated|deleted>` in the service's `outbox` table **in the same transaction** (data = the row, subject = its id; bulk writes without rows store `{ count, where }`).
+  - The `OutboxRelay` in `AnnophisServiceModule` publishes the outbox to NATS. A NATS outage delays events, but never loses them or fails writes.
   - The contract is `EntityChangedEvent` in `@annophis/contracts`.
   - Admin CRUD goes through the same client, so it emits too. **Never publish entity events from controllers.**
-  - Fire-and-forget after the query returns: a NATS outage logs and drops the event and never fails the write. Inside an interactive transaction, an event can precede the commit. A transactional outbox is the upgrade path when that matters.
+  - Each service needs `model Outbox` in its Prisma schema (copy it from another service) and `"excludeTables": ["outbox"]` in `data-source.json`.
+- **Non-entity events** (e.g. "import finished"): `bus.publish(type, data)` directly. That path is not transactional; if it must not get lost, write a domain row and let the outbox carry the event.
 - **Stream:** one JetStream stream `ANNOPHIS` on `annophis.>`. Inspect with `docker run --rm -it --network annophis-net natsio/nats-box nats sub -s nats://nats:4222 'annophis.>'`, or watch the `http://localhost:6482` monitoring page.
 - **Tests:** use `createEventBusMock()` from `@annophis/testing`. It records `publish` calls without NATS.

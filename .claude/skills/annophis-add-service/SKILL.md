@@ -33,7 +33,7 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
    - `crouton-backend/tsconfig.json`: remove `rootDir`.
    - `crouton-backend/tsup.config.ts`: `noExternal: [/@<svc>\/.*/, /@annophis\/.*/]`.
    - `crouton-backend/nodemon.json`: add `"../../../libs"` to `watch`.
-5. Wrap the Prisma client in `crouton-backend/src/app/data-sources/default/index.ts`: `const client = withEntityEvents(new PrismaClient({ adapter }), '<svc>');` (from `@annophis/events`). Add `AnnophisServiceModule.forRoot()` after `ConfigModule` in `app.module.ts`, add the keycloak auth provider (copy from another service and set `authProvidersDir` in `crouton.json`), and add the admin env vars from another service's `.env.example`.
+5. Outbox: copy `model Outbox` from another service's `prisma/default/schema.prisma`, add `"excludeTables": ["outbox"]` to `data-source.json`, and generate its migration (`prisma migrate dev`, or `prisma migrate diff --from-empty --to-schema … --script` offline). Wrap the Prisma client in `crouton-backend/src/app/data-sources/default/index.ts`: `const client = withEntityEvents(new PrismaClient({ adapter }), '<svc>');` (from `@annophis/events`). Add `AnnophisServiceModule.forRoot()` after `ConfigModule` in `app.module.ts`, add the keycloak auth provider (copy from another service and set `authProvidersDir` in `crouton.json`), and add the admin env vars from another service's `.env.example`.
 6. Tags:
    - Backend `project.json`: `["scope:backend", "type:app"]`.
    - `generated/<svc>/default/types/package.json`: `"nx": { "tags": ["scope:shared", "type:generated"] }`.
