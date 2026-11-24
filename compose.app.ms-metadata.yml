@@ -3,23 +3,6 @@ networks:
     name: annophis-net
 
 services:
-  ms-metadata-frontend:
-    build:
-      context: .
-      dockerfile: apps/ms-metadata/Dockerfile.dev
-    env_file: [apps/ms-metadata/.env]
-    ports:
-      - "${FRONTEND_PORT:-6204}:${FRONTEND_PORT:-6204}"
-    environment:
-      - BACKEND_HOST=ms-metadata-backend
-      - NX_COMMAND=ms-metadata-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   ms-metadata-backend:
     build:
       context: .

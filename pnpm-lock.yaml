@@ -341,6 +341,9 @@ importers:
       express-session:
         specifier: ^1.19.0
         version: 1.19.0(supports-color@7.2.0)
+      http-proxy-middleware:
+        specifier: ^4.2.2
+        version: 4.2.2(supports-color@7.2.0)
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -550,55 +553,6 @@ importers:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
 
-  apps/ms-annotation/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@ms-annotation/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/ms-annotation/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
-
   apps/ms-corpora/crouton-backend:
     dependencies:
       '@ghentcdh/crouton-api':
@@ -662,55 +616,6 @@ importers:
       zod-prisma-types:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
-
-  apps/ms-corpora/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@ms-corpora/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/ms-corpora/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
 
   apps/ms-metadata/crouton-backend:
     dependencies:
@@ -776,55 +681,6 @@ importers:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
 
-  apps/ms-metadata/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@ms-metadata/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/ms-metadata/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
-
   apps/ms-projects/crouton-backend:
     dependencies:
       '@ghentcdh/crouton-api':
@@ -888,55 +744,6 @@ importers:
       zod-prisma-types:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
-
-  apps/ms-projects/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@ms-projects/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/ms-projects/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
 
   apps/text-service-1/crouton-backend:
     dependencies:
@@ -1002,55 +809,6 @@ importers:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
 
-  apps/text-service-1/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@text-service-1/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/text-service-1/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
-
   apps/text-service-2/crouton-backend:
     dependencies:
       '@ghentcdh/crouton-api':
@@ -1114,55 +872,6 @@ importers:
       zod-prisma-types:
         specifier: ^3.3.11
         version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
-
-  apps/text-service-2/crouton-frontend:
-    dependencies:
-      '@ghentcdh/crouton-vue':
-        specifier: 0.2.0-rc.4
-        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
-      '@text-service-2/generated-default-types':
-        specifier: workspace:*
-        version: link:../../../generated/text-service-2/default/types
-      axios:
-        specifier: ^1.7.0
-        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      vee-validate:
-        specifier: 5.0.0-beta.0
-        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
-      vue:
-        specifier: ^3.5.45
-        version: 3.5.46(typescript@5.9.3)
-      vue-router:
-        specifier: ^5.4.0
-        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.3.5
-        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.10
-        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
-      daisyui:
-        specifier: ^5.6.0
-        version: 5.8.2
-      eslint-plugin-vue:
-        specifier: ^10.12.0
-        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
-      tailwindcss:
-        specifier: ^4.3.5
-        version: 4.3.5
-      typescript:
-        specifier: ~5.9.0
-        version: 5.9.3
-      vite:
-        specifier: ^8.3.6
-        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      vue-tsc:
-        specifier: 3.3.14
-        version: 3.3.14(typescript@5.9.3)
 
   generated/gateway/default/types:
     dependencies:
@@ -5202,6 +4911,10 @@ packages:
     resolution: {integrity: sha512-+ZT+iBxVUQ1asugqnD6oWoRiS25AkjNfG085dKJGtGxkdwLQrMKU5wJr2bOOFAXzKcTuqq+7fZlTMgG3SRfIYQ==}
     engines: {node: '>= 14'}
 
+  http-proxy-middleware@4.2.2:
+    resolution: {integrity: sha512-GHP6tbjWsdSZbWSyqYvwPwoR76ozJ2IccVYoBR702N9vfqO0KBIwJ9vkDRErxwbb5Z6ej2Wn+9D/YitlUTseSQ==}
+    engines: {node: ^22.15.0 || ^24.0.0 || >=26.0.0}
+
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
@@ -5213,6 +4926,9 @@ packages:
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
+
+  httpxy@0.5.6:
+    resolution: {integrity: sha512-iqc3nOxvNb5FxbhJozt8wNmHgjlmk4zzba512jMEXVwHCEBCbGAj49eGfy5PI8ts3/LFSFq8siiSNqwfY1AlfQ==}
 
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
@@ -5334,6 +5050,10 @@ packages:
   is-path-inside@3.0.3:
     resolution: {integrity: sha512-Fd4gABb+ycGAmKou8eMftCupSir5lRxqf4aD/vd0cD2qc4HL07OjCeuHMr8Ro4CoMaeCKDB0/ECBOVWjTwUvPQ==}
     engines: {node: '>=8'}
+
+  is-plain-obj@4.1.0:
+    resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
+    engines: {node: '>=12'}
 
   is-promise@4.0.0:
     resolution: {integrity: sha512-hvpoI6korhJMnej285dSg6nu1+e6uxs7zG3BYAm5byqDsgJNWwxzM6z6iZiAgQR4TJ30JmBTOwqZUw3WlyH3AQ==}
@@ -11866,6 +11586,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  http-proxy-middleware@4.2.2(supports-color@7.2.0):
+    dependencies:
+      debug: 4.4.3(supports-color@7.2.0)
+      httpxy: 0.5.6
+      is-glob: 4.0.3
+      is-plain-obj: 4.1.0
+      micromatch: 4.0.8
+    transitivePeerDependencies:
+      - supports-color
+
   https-proxy-agent@5.0.1(supports-color@7.2.0):
     dependencies:
       agent-base: 6.0.2(supports-color@7.2.0)
@@ -11886,6 +11616,8 @@ snapshots:
       debug: 4.4.3(supports-color@7.2.0)
     transitivePeerDependencies:
       - supports-color
+
+  httpxy@0.5.6: {}
 
   human-signals@2.1.0: {}
 
@@ -11966,6 +11698,8 @@ snapshots:
   is-path-cwd@2.2.0: {}
 
   is-path-inside@3.0.3: {}
+
+  is-plain-obj@4.1.0: {}
 
   is-promise@4.0.0: {}
 

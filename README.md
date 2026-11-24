@@ -33,8 +33,8 @@ Annophis only uses ports 6100–6499 (see the Ports section in [AGENTS.md](AGENT
 
 | What | URL |
 |---|---|
-| Gateway UI / admin hub | http://localhost:6200 — log in as `admin`/`admin` (Keycloak) |
-| Service backends | http://localhost:6100 (gateway), 6101–6104 (`ms-*`), 6110/6111 (text services), 6120 (ml-adapter); admin frontends on the same suffix in 6200–6299 |
+| Admin UI (all services) | http://localhost:6200 — log in as `admin`/`admin` (Keycloak) |
+| Service backends | http://localhost:6100 (gateway), 6101–6104 (`ms-*`), 6110/6111 (text services), 6120 (ml-adapter) |
 | Keycloak | http://localhost:6480 (console `admin`/`admin`; realm `annophis`, users `admin`/`admin`, `viewer`/`viewer`) |
 | NATS monitoring | http://localhost:6482 |
 | Postgres | `localhost:6432`, database `annophis`, one schema + user per service (password `dev`) |

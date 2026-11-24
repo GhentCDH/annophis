@@ -1,32 +1,37 @@
 import { expect, test } from '@playwright/test';
 
-import { adminServices } from './services';
 import { authFile, sessionToken } from './users';
+
+type Node = { kind?: string; id: string; label: string; route?: string; children?: Node[] };
+
+const layout = async (request: import('@playwright/test').APIRequestContext, token: string | null) => {
+  const res = await request.get('/api/_app/layout', { headers: { Authorization: `Bearer ${token}` } });
+  expect(res.ok()).toBe(true);
+  return (await res.json()) as { sidebar: Node[] };
+};
 
 test.describe('as admin', () => {
   test.use({ storageState: authFile('admin') });
 
-  test('the hub links every service admin', async ({ page }) => {
-    await page.goto('/');
-    const nav = page.getByRole('navigation', { name: 'Service admins' });
-    for (const { name } of adminServices) {
-      await expect(nav.getByRole('link', { name: new RegExp(name) })).toHaveAttribute('href', `/${name}/`);
-    }
+  test('one admin UI: the gateway merges every service into one sidebar', async ({ page, request }) => {
+    const { sidebar } = await layout(request, await sessionToken(page));
+    const projects = sidebar.find((n) => n.kind === 'group' && n.id === 'ms-projects');
+    expect(projects?.children).toContainEqual(
+      expect.objectContaining({ id: 'ms-projects.project', route: 'ms-projects/project' }),
+    );
   });
 
-  for (const { name } of adminServices) {
-    test(`${name} admin opens without a second login`, async ({ page }) => {
-      await page.goto(`/${name}/`);
-      await expect(page).toHaveURL(new RegExp(`^http://localhost:6200/${name}/`));
-      expect(page.url()).not.toContain('/realms/annophis');
-    });
-  }
+  test('a service resource opens in the gateway UI through the proxy', async ({ page }) => {
+    await page.goto('/');
+    const schemas = page.waitForResponse((r) => r.url().includes('/api/ms-projects/project/schemas'));
+    await page.getByRole('link', { name: 'Project', exact: true }).click();
+    expect((await schemas).ok()).toBe(true);
+    await expect(page).toHaveURL(/ms-projects\.project/);
+  });
 
   test('CRUD a project in ms-projects through the gateway', async ({ page, request }) => {
-    const token = await sessionToken(page);
-    expect(token).toBeTruthy();
-    const headers = { Authorization: `Bearer ${token}` };
-    const api = '/ms-projects/api/project';
+    const headers = { Authorization: `Bearer ${await sessionToken(page)}` };
+    const api = '/api/ms-projects/project';
     const name = `e2e ${Date.now()}`;
 
     const created = await request.post(api, { headers, data: { name } });
@@ -45,15 +50,15 @@ test.describe('as admin', () => {
 test.describe('as viewer (no admin role)', () => {
   test.use({ storageState: authFile('viewer') });
 
-  test('the hub refuses access', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.getByRole('alert')).toContainText('no admin role');
-    await expect(page.getByRole('navigation', { name: 'Service admins' })).toHaveCount(0);
+  test('the merged sidebar has no service groups', async ({ page, request }) => {
+    const { sidebar } = await layout(request, await sessionToken(page));
+    expect(sidebar.filter((n) => n.kind === 'group')).toEqual([]);
   });
 
   test('service APIs answer 403', async ({ page, request }) => {
-    const token = await sessionToken(page);
-    const res = await request.get('/ms-projects/api/project', { headers: { Authorization: `Bearer ${token}` } });
+    const res = await request.get('/api/ms-projects/project', {
+      headers: { Authorization: `Bearer ${await sessionToken(page)}` },
+    });
     expect(res.status()).toBe(403);
   });
 });

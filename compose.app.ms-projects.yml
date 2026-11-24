@@ -3,23 +3,6 @@ networks:
     name: annophis-net
 
 services:
-  ms-projects-frontend:
-    build:
-      context: .
-      dockerfile: apps/ms-projects/Dockerfile.dev
-    env_file: [apps/ms-projects/.env]
-    ports:
-      - "${FRONTEND_PORT:-6201}:${FRONTEND_PORT:-6201}"
-    environment:
-      - BACKEND_HOST=ms-projects-backend
-      - NX_COMMAND=ms-projects-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   ms-projects-backend:
     build:
       context: .

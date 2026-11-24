@@ -12,7 +12,8 @@ import { resolve } from 'node:path';
       resolve(__dirname, 'resources'),
       resolve(__dirname, 'data-sources'),
       {
-        baseUrl: '',
+        // served to the gateway's single admin UI under /ms-annotation (gateway proxy strips the prefix)
+        baseUrl: '/ms-annotation',
       },
     ),
     // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello (ServiceAuthGuard is opt-in)

@@ -28,7 +28,7 @@ COPY . .
 RUN cd apps/ms-annotation && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
 
 # Build applications
-RUN npx nx build ms-annotation-backend && npx nx build ms-annotation-frontend
+RUN npx nx build ms-annotation-backend
 
 # Create flat node_modules for backend (no pnpm symlinks)
 RUN pnpm --filter @ms-annotation/backend deploy --legacy --prod /app/deployed-backend
@@ -55,8 +55,6 @@ RUN find /app/generated/ms-annotation/default/types/src -name '*.ts' \
 # ========================================================
 FROM node:24-alpine
 
-RUN apk add --no-cache caddy ca-certificates openssl
-
 WORKDIR /app
 
 ARG VERSION=unknown
@@ -72,17 +70,11 @@ COPY --from=build /app/generated/ms-annotation/default/client ./generated/client
 # runtime-required data-sources resolve `@ms-annotation/generated-default-client`.
 COPY --from=build /app/generated/ms-annotation/default/client ./node_modules/@ms-annotation/generated-default-client
 COPY --from=build /app/generated/ms-annotation/default/types ./node_modules/@ms-annotation/generated-default-types
-COPY --from=build /app/apps/ms-annotation/crouton-frontend/dist /srv/frontend
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ms-annotation/crouton.json apps/ms-annotation/crouton.enums.json ./
 
-COPY apps/ms-annotation/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
-COPY apps/ms-annotation/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+EXPOSE 3000
 
-EXPOSE 9000 3000
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+CMD ["node", "backend/main.js"]
 

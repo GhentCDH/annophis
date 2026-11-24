@@ -6,6 +6,7 @@ import session from 'express-session';
 
 import { applyResourceTagDescriptions } from '@ghentcdh/crouton-api';
 
+import { mountAdminFacade } from './admin-facade';
 import { AppModule } from './app/app.module';
 
 const bootstrap = async () => {
@@ -23,6 +24,10 @@ const bootstrap = async () => {
     }),
   );
 
+  const port = process.env.BACKEND_PORT || process.env.PORT || 3000;
+  // One admin UI for all services: merged /_app/layout + /<svc>/* proxy (before Nest's router).
+  mountAdminFacade(app, port);
+
   const config = new DocumentBuilder()
     .setTitle('Annophis')
     .setVersion('0.0.1')
@@ -33,7 +38,6 @@ const bootstrap = async () => {
   );
   SwaggerModule.setup('docs', app, document);
 
-  const port = process.env.BACKEND_PORT || process.env.PORT || 3000;
   await app.listen(port);
   Logger.log(`Application running on http://localhost:${port}`);
 };

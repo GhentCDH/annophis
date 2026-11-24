@@ -3,23 +3,6 @@ networks:
     name: annophis-net
 
 services:
-  text-service-1-frontend:
-    build:
-      context: .
-      dockerfile: apps/text-service-1/Dockerfile.dev
-    env_file: [apps/text-service-1/.env]
-    ports:
-      - "${FRONTEND_PORT:-6210}:${FRONTEND_PORT:-6210}"
-    environment:
-      - BACKEND_HOST=text-service-1-backend
-      - NX_COMMAND=text-service-1-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   text-service-1-backend:
     build:
       context: .

@@ -8,7 +8,7 @@ Entry point for every coding agent (Claude, Codex, Copilot, Cursor). `CLAUDE.md`
 apps/<svc>/                one crouton project per service
   crouton.json             resource/data-source dirs for this service
   crouton-backend/         NestJS (crouton-api)
-  crouton-frontend/        Vue (crouton-vue), the service's DB admin; absent for API-only services
+  crouton-frontend/        gateway only: the single admin UI (crouton-vue) for every service
   prisma/default/          schema.prisma + prisma.config.ts
   .env.example             copy to .env
 libs/<lib>/                shared TypeScript, imported as @annophis/<lib>
@@ -47,9 +47,13 @@ Use the `annophis-lib` skill to pick the right lib kind.
 
 ## Admin UIs (internal only)
 
-- **Login:** `http://localhost:6200` is the admin hub. One Keycloak login at the gateway, using the server-side flow with the confidential `annophis-gateway` client, gives a crouton session token.
-- **Access:** every backend accepts that token because all of them share `CROUTON_AUTH_SECRET`. Each backend's `auth-providers/keycloak/auth-provider.json` requires the `admin` realm role (`defaultSecurity`).
-- **Routing:** the hub links to `/<svc>/`. The gateway's Vite dev server proxies that to the service's own admin frontend (`base: '/<svc>/'`), which proxies `/<svc>/api` to its backend. The gateway's own DB admin is at `/admin`.
+- **One admin UI:** `http://localhost:6200` (the gateway's crouton frontend) is the only frontend. Services have no frontend of their own.
+- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. Every backend accepts it (shared `CROUTON_AUTH_SECRET`) and requires the `admin` realm role (`auth-providers/keycloak/auth-provider.json`, `defaultSecurity`).
+- **Gateway facade** (`apps/gateway/crouton-backend/src/admin-facade.ts`):
+  - `GET /_app/layout` merges the gateway's sidebar with one group per service. Leaf ids become `<svc>.<id>` and routes `<svc>/<route>` (`merge-layouts.ts`); services are listed only for admins.
+  - `/<svc>/*` is reverse-proxied to that service with the prefix stripped and `Authorization` forwarded.
+  - Each service sets `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir`, so its CRUD/relation URIs carry the prefix.
+  - The service list (name, sidebar title, port) lives in `apps/gateway/crouton-backend/src/services.ts`.
 - **Not public:** admin writes go straight to the database (events come from the Prisma extension, not controllers), so never expose the admin UIs publicly.
 - **Keycloak hostname:** `KEYCLOAK_URL=http://keycloak.localhost:6480` everywhere. `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer is the same for all of them.
 
@@ -96,19 +100,19 @@ Annophis owns fixed port ranges so it can run next to other local projects (whic
 | Range | Use |
 |---|---|
 | 6100–6199 | service backends (`BACKEND_PORT`) |
-| 6200–6299 | service admin frontends (`FRONTEND_PORT`), same suffix as the backend |
+| 6200–6299 | frontends: the gateway admin UI (6200); reserved for future UIs |
 | 6400–6499 | infra host ports |
 
 | Service | Backend | Frontend |
 |---|---|---|
-| gateway | 6100 | 6200 |
-| ms-projects | 6101 | 6201 |
-| ms-corpora | 6102 | 6202 |
-| ms-annotation | 6103 | 6203 |
-| ms-metadata | 6104 | 6204 |
-| text-service-1 | 6110 | 6210 |
-| text-service-2 | 6111 | 6211 |
-| ml-adapter | 6120 | none (API only) |
+| gateway | 6100 | 6200 (the admin UI for all services) |
+| ms-projects | 6101 | — |
+| ms-corpora | 6102 | — |
+| ms-annotation | 6103 | — |
+| ms-metadata | 6104 | — |
+| text-service-1 | 6110 | — |
+| text-service-2 | 6111 | — |
+| ml-adapter | 6120 | — |
 
 | Infra | Host port | Inside Docker |
 |---|---|---|

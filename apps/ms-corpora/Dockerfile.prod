@@ -28,7 +28,7 @@ COPY . .
 RUN cd apps/ms-corpora && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
 
 # Build applications
-RUN npx nx build ms-corpora-backend && npx nx build ms-corpora-frontend
+RUN npx nx build ms-corpora-backend
 
 # Create flat node_modules for backend (no pnpm symlinks)
 RUN pnpm --filter @ms-corpora/backend deploy --legacy --prod /app/deployed-backend
@@ -55,8 +55,6 @@ RUN find /app/generated/ms-corpora/default/types/src -name '*.ts' \
 # ========================================================
 FROM node:24-alpine
 
-RUN apk add --no-cache caddy ca-certificates openssl
-
 WORKDIR /app
 
 ARG VERSION=unknown
@@ -72,17 +70,11 @@ COPY --from=build /app/generated/ms-corpora/default/client ./generated/client
 # runtime-required data-sources resolve `@ms-corpora/generated-default-client`.
 COPY --from=build /app/generated/ms-corpora/default/client ./node_modules/@ms-corpora/generated-default-client
 COPY --from=build /app/generated/ms-corpora/default/types ./node_modules/@ms-corpora/generated-default-types
-COPY --from=build /app/apps/ms-corpora/crouton-frontend/dist /srv/frontend
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ms-corpora/crouton.json apps/ms-corpora/crouton.enums.json ./
 
-COPY apps/ms-corpora/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
-COPY apps/ms-corpora/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+EXPOSE 3000
 
-EXPOSE 9000 3000
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+CMD ["node", "backend/main.js"]
 

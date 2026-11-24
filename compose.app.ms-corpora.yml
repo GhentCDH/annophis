@@ -3,23 +3,6 @@ networks:
     name: annophis-net
 
 services:
-  ms-corpora-frontend:
-    build:
-      context: .
-      dockerfile: apps/ms-corpora/Dockerfile.dev
-    env_file: [apps/ms-corpora/.env]
-    ports:
-      - "${FRONTEND_PORT:-6202}:${FRONTEND_PORT:-6202}"
-    environment:
-      - BACKEND_HOST=ms-corpora-backend
-      - NX_COMMAND=ms-corpora-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   ms-corpora-backend:
     build:
       context: .
