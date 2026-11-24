@@ -12,6 +12,8 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'node',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // *.int.spec.ts need a running NATS: nx run events:integration (vitest.int.config.mts)
+    exclude: ['**/*.int.spec.ts', '**/node_modules/**'],
     passWithNoTests: true,
     reporters: ['default'],
     coverage: {

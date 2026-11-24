@@ -49,6 +49,13 @@ jobs:
             curl -sf -o /dev/null "$url" || { echo "::error::$url not up"; tail -100 dev.log; exit 1; }
           done
 
+      - name: Event bus integration (real NATS)
+        run: pnpm nx run events:integration
+
+      - name: Provider contract tests
+        run: pnpm nx run e2e:contract
+        env: { CI: 'true' }
+
       - name: Playwright
         run: pnpm nx e2e e2e
         env: { CI: 'true' }

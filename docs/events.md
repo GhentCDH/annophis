@@ -60,6 +60,7 @@ await bus.subscribe('ms-projects.project.*', async (event) => {
 - One **durable consumer per service and filter**, so a restarted service resumes where it stopped.
 - A handler that throws is NAKed and the message is redelivered, so handlers must be idempotent.
 - Phase-0 smoke test: on start, every service publishes `<svc>.hello` and logs the hellos of all the others.
+- `pnpm nx run events:integration` tests the `EventBus` against real NATS: delivery with the envelope, and redelivery after a handler throws. It runs in CI's e2e workflow.
 
 ## Watching the bus
 - Monitoring: http://localhost:6482
