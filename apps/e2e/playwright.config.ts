@@ -9,10 +9,12 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
-  reporter: process.env['CI'] ? [['html', { open: 'never' }], ['github']] : 'list',
+  reporter: process.env['CI'] ? [['html', { open: 'never', outputFolder: 'playwright-report' }], ['github'], ['list']] : 'list',
+  outputDir: 'test-results',
   use: {
     baseURL: process.env['GATEWAY_URL'] ?? 'http://localhost:6200',
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [
     { name: 'setup', testMatch: /.*\.setup\.ts/ },

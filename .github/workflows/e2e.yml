@@ -53,6 +53,16 @@ jobs:
         run: pnpm nx e2e e2e
         env: { CI: 'true' }
 
+      - name: Diagnose
+        if: failure()
+        run: |
+          echo "--- login chain"
+          curl -s -i http://localhost:6200/api/_app/auth | head -20 || true
+          curl -s -i http://localhost:6200/api/_app/auth/keycloak/login | head -12 || true
+          curl -s -o /dev/null -w "keycloak discovery: %{http_code}\n" http://keycloak.localhost:6480/realms/annophis/.well-known/openid-configuration || true
+          echo "--- dev.log (tail)"
+          tail -150 dev.log | sed 's/\x1b\[[0-9;]*m//g'
+
       - name: Upload report
         if: failure()
         uses: actions/upload-artifact@v4
