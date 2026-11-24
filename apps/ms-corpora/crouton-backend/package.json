@@ -21,7 +21,10 @@
     "rxjs": "^7.0.0",
     "tslib": "^2.9.1",
     "zod": "^4.0.0",
-    "@ms-corpora/generated-default-types": "workspace:*"
+    "@ms-corpora/generated-default-types": "workspace:*",
+    "@nats-io/jetstream": "^3.5.0",
+    "@nats-io/transport-node": "^3.5.0",
+    "jose": "^6.2.18"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

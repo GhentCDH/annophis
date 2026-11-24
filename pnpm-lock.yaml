@@ -311,6 +311,12 @@ importers:
       '@ghentcdh/crouton-api':
         specifier: 0.2.0-rc.4
         version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -344,6 +350,9 @@ importers:
       http-proxy-middleware:
         specifier: ^4.2.2
         version: 4.2.2(supports-color@7.2.0)
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -433,6 +442,12 @@ importers:
       '@ml-adapter/generated-default-types':
         specifier: workspace:*
         version: link:../../../generated/ml-adapter/default/types
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -460,6 +475,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -497,6 +515,12 @@ importers:
       '@ms-annotation/generated-default-types':
         specifier: workspace:*
         version: link:../../../generated/ms-annotation/default/types
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -524,6 +548,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -561,6 +588,12 @@ importers:
       '@ms-corpora/generated-default-types':
         specifier: workspace:*
         version: link:../../../generated/ms-corpora/default/types
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -588,6 +621,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -625,6 +661,12 @@ importers:
       '@ms-metadata/generated-default-types':
         specifier: workspace:*
         version: link:../../../generated/ms-metadata/default/types
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -652,6 +694,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -689,6 +734,12 @@ importers:
       '@ms-projects/generated-default-types':
         specifier: workspace:*
         version: link:../../../generated/ms-projects/default/types
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -716,6 +767,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -750,6 +804,12 @@ importers:
       '@ghentcdh/crouton-api':
         specifier: 0.2.0-rc.4
         version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -780,6 +840,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -814,6 +877,12 @@ importers:
       '@ghentcdh/crouton-api':
         specifier: 0.2.0-rc.4
         version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
@@ -844,6 +913,9 @@ importers:
       dotenv:
         specifier: ^18.0.10
         version: 18.0.10
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       pg:
         specifier: ^8.23.0
         version: 8.23.1

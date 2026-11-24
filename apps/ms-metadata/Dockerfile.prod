@@ -36,11 +36,21 @@ RUN pnpm --filter @ms-metadata/backend deploy --legacy --prod /app/deployed-back
 # Transpile resource & data-source .ts → .js for runtime require()
 COPY apps/ms-metadata/crouton-backend/src/app/resources /app/dist/apps/ms-metadata/crouton-backend/resources
 COPY apps/ms-metadata/crouton-backend/src/app/data-sources /app/dist/apps/ms-metadata/crouton-backend/data-sources
-RUN find /app/dist/apps/ms-metadata/crouton-backend/resources /app/dist/apps/ms-metadata/crouton-backend/data-sources -name '*.ts' \
+RUN find /app/dist/apps/ms-metadata/crouton-backend/resources -name '*.ts' \
     | while read f; do \
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
-    && find /app/dist/apps/ms-metadata/crouton-backend/resources /app/dist/apps/ms-metadata/crouton-backend/data-sources -name '*.ts' -delete
+    && find /app/dist/apps/ms-metadata/crouton-backend/resources -name '*.ts' -delete
+# Data sources import @annophis/* libs (tsconfig paths, not packages): bundle those in, keep npm packages and the
+# generated client (copied into node_modules below) external.
+RUN find apps/ms-metadata/crouton-backend/src/app/data-sources -name 'index.ts' \
+    | while read f; do \
+        out="/app/dist/apps/ms-metadata/crouton-backend/data-sources/${f#apps/ms-metadata/crouton-backend/src/app/data-sources/}"; \
+        npx esbuild "$f" --bundle --packages=external --external:'@ms-metadata/*' \
+          --tsconfig=apps/ms-metadata/crouton-backend/tsconfig.json \
+          --outfile="${out%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/dist/apps/ms-metadata/crouton-backend/data-sources -name '*.ts' -delete
 
 # Transpile generated types .ts → .js
 RUN find /app/generated/ms-metadata/default/types/src -name '*.ts' \

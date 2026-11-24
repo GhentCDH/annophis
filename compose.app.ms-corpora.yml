@@ -7,11 +7,13 @@ services:
     build:
       context: .
       dockerfile: apps/ms-corpora/Dockerfile.dev
-    env_file: [apps/ms-corpora/.env]
+    env_file:
+      - apps/ms-corpora/.env.example  # committed dev defaults, so a fresh clone starts
+      - { path: apps/ms-corpora/.env, required: false }  # local overrides
     ports:
       - "${BACKEND_PORT:-6102}:${BACKEND_PORT:-6102}"
-    # The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
-    command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-corpora; (cd apps/ms-corpora && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run ms-corpora-backend:serve"
+    # nx serve needs apps/<svc>/.env (created from .env.example on first start). The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
+    command: sh -c "[ -f apps/ms-corpora/.env ] || cp apps/ms-corpora/.env.example apps/ms-corpora/.env; pnpm exec crouton generate --yes --cwd apps/ms-corpora; (cd apps/ms-corpora && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run ms-corpora-backend:serve"
     depends_on:
       postgres: { condition: service_healthy }
       nats: { condition: service_healthy }

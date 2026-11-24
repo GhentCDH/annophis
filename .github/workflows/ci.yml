@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  # every PR, including stacked ones that target a feature branch
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
     # More shared workflows (docs, GitHub release, labeler) live next to it.
     uses: GhentCDH/crouton/.github/workflows/shared-ci.yml@main
     with:
-      targets: '["lint", "typecheck", "build"]'
+      targets: '["lint", "typecheck", "test", "build"]'
       # The generated types package.json is committed and the Prisma client is
       # not a workspace package, so the lockfile installs frozen. Then generate
       # from the committed Prisma schema (no database needed).

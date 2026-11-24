@@ -39,7 +39,15 @@ Annophis only uses ports 6100–6499 (see the Ports section in [AGENTS.md](AGENT
 | NATS monitoring | http://localhost:6482 |
 | Postgres | `localhost:6432`, database `annophis`, one schema + user per service (password `dev`) |
 
-To run infra in Docker and the apps on the host: `docker compose up postgres nats keycloak`, then `pnpm dev`.
+To run infra in Docker and the apps on the host (much lighter than 15 dev containers):
+
+```sh
+docker compose up -d postgres nats keycloak
+for d in apps/*/; do [ -f "$d.env" ] || cp "$d.env.example" "$d.env"; done   # first time
+pnpm dev
+```
+
+Docker reads each `apps/<svc>/.env.example` (committed dev defaults), optionally overridden by `apps/<svc>/.env`.
 
 Postgres reads its init files only on an empty volume. To reset: `docker compose down && rm -rf var`. Keycloak keeps no data: it re-imports `docker/keycloak/annophis-realm.json` on every start, so export console changes (below) or they are lost.
 
@@ -56,5 +64,14 @@ docker compose start keycloak
 ```
 
 **The admin UIs are internal tools.** They write to the databases directly. Only users with the Keycloak `admin` role get in, and they must never be exposed publicly.
+
+### CI
+
+| Workflow | When | What |
+|---|---|---|
+| `ci.yml` | every PR, push to main | lint, typecheck, test, build (crouton shared CI) |
+| `e2e.yml` | every PR, push to main | infra in Docker + all services via `pnpm dev`, then Playwright (`apps/e2e`); report uploaded on failure |
+| `docker-build.yml` | tag `v*` | one image per service to `ghcr.io/<owner>/annophis-<svc>`, then a GitHub release from Conventional Commits |
+| `labeler.yml`, `pr-title.yml` | PRs | labels from branch/files/title; title must be a Conventional Commit |
 
 The development guide for coding agents is [AGENTS.md](AGENTS.md).
