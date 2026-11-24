@@ -33,6 +33,8 @@ const bootstrap = async () => {
   const config = new DocumentBuilder()
     .setTitle('Annophis')
     .setVersion('0.0.1')
+    .addServer('/api', 'via the admin UI')
+    .addServer('/', 'the gateway directly')
     .build();
   const document = await applyResourceTagDescriptions(
     app,

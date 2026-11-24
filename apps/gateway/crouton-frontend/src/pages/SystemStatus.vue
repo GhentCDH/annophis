@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto max-w-3xl p-8">
+  <main class="mx-auto max-w-5xl p-8">
     <header class="mb-6 flex items-center justify-between gap-4">
       <h1 class="text-2xl font-semibold">System status</h1>
       <span
@@ -20,6 +20,8 @@
           <th>Service</th>
           <th>Status</th>
           <th>Event bus</th>
+          <th>Crouton</th>
+          <th>Links</th>
           <th>Details</th>
         </tr>
       </thead>
@@ -33,6 +35,21 @@
             <span class="badge badge-outline" :class="s.bus ? 'badge-success' : 'badge-warning'">
               {{ s.bus ? 'connected' : 'disconnected' }}
             </span>
+          </td>
+          <td>
+            <a
+              v-if="s.crouton"
+              class="badge"
+              :class="s.crouton.ok ? 'badge-success' : 'badge-error'"
+              :href="`${base(s.service)}/crouton/status.json`"
+              :title="`${s.crouton.databaseErrors} database, ${s.crouton.resourceErrors} resource errors, ${s.crouton.warningCount} warnings`"
+            >
+              {{ s.crouton.ok ? 'ok' : `${s.crouton.databaseErrors + s.crouton.resourceErrors} errors` }}
+            </a>
+          </td>
+          <td class="space-x-2 text-sm">
+            <a class="link" :href="`${base(s.service)}/docs`">API docs</a>
+            <a class="link" :href="`${base(s.service)}/crouton/status.json`">status</a>
           </td>
           <td class="text-sm opacity-70">{{ s.error ?? '' }}</td>
         </tr>
@@ -51,10 +68,14 @@ import { onMounted, onUnmounted, ref } from 'vue';
 
 import { useApi } from '../api';
 
-type ServiceHealth = { service: string; status: 'ok' | 'down'; bus?: boolean; error?: string };
+type CroutonStatus = { ok: boolean; databaseErrors: number; resourceErrors: number; warningCount: number };
+type ServiceHealth = { service: string; status: 'ok' | 'down'; bus?: boolean; crouton?: CroutonStatus; error?: string };
 type Health = { status: 'ok' | 'degraded'; services: ServiceHealth[] };
 
 const REFRESH_SECONDS = 10;
+
+/** Where a service is reachable through the gateway: the gateway itself at /api, services at /api/<svc>. */
+const base = (service: string) => (service === 'gateway' ? '/api' : `/api/${service}`);
 
 const health = ref<Health | null>(null);
 const error = ref<string | null>(null);
