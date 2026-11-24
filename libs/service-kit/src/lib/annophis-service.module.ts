@@ -1,9 +1,10 @@
-import { Controller, Get, Global, Inject, Injectable, Logger, Module, UseGuards } from '@nestjs/common';
+import { Controller, Get, Global, Inject, Injectable, Logger, Module, Req, UseGuards } from '@nestjs/common';
 import type { DynamicModule, OnApplicationBootstrap } from '@nestjs/common';
 
 import { EVENTS_OPTIONS, EventBus } from '@annophis/events';
 import type { EventsOptions } from '@annophis/events';
 import { Public, ServiceAuthGuard } from '@annophis/service-auth';
+import type { Caller } from '@annophis/service-auth';
 
 // Explicit @Inject everywhere: `pnpm dev` runs tsx (esbuild), which emits no decorator metadata.
 @Controller()
@@ -20,11 +21,14 @@ class HealthController {
     return { service: this.o.service, status: 'ok', bus: this.bus.isConnected() };
   }
 
-  /** Phase 0 smoke test: publishes `<service>.hello`; every other service logs it. */
+  /**
+   * Sample guarded domain route: publishes `<service>.hello` (every other service logs it) and echoes who called,
+   * i.e. the user from the gateway's internal token or `{ type: 'service' }` for an API key.
+   */
   @Get('hello')
-  async hello() {
+  async hello(@Req() req: { caller?: Caller }) {
     await this.bus.publish(`${this.o.service}.hello`, { message: 'hi' });
-    return { sent: true };
+    return { sent: true, service: this.o.service, caller: req.caller ?? null };
   }
 }
 
