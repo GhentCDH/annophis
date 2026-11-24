@@ -32,4 +32,12 @@ test.describe('status page', () => {
       await expect(table.getByRole('row', { name: new RegExp(`^${name}\\b`) })).toBeVisible();
     }
   });
+
+  test('shows the crouton status of a service', async ({ page }) => {
+    await page.goto('/system-status');
+    const details = page.getByRole('region', { name: 'Crouton status per service' }).locator('details', { hasText: 'ms-projects' });
+    await details.locator('summary').click();
+    const resources = details.getByRole('table', { name: 'ms-projects resources' });
+    await expect(resources.getByRole('row', { name: /project\s+valid/ })).toBeVisible();
+  });
 });

@@ -3,8 +3,25 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { adminServices, serviceUrl } from './services';
 
-/** Summary of the service's crouton self-check (GET /crouton/status.json). */
-export type CroutonStatus = { ok: boolean; databaseErrors: number; resourceErrors: number; warningCount: number };
+/** The main parts of a service's crouton self-check (GET /crouton/status.json); enums and i18n are left out. */
+export type CroutonStatus = {
+  version: string;
+  croutonVersion: string;
+  environment: string;
+  summary: { ok: boolean; databaseErrors: number; resourceErrors: number; warningCount: number };
+  databases: { name: string; connected: boolean; error?: string }[];
+  resources: {
+    name: string;
+    path: string;
+    valid: boolean;
+    error?: string;
+    version?: number;
+    expectedVersion?: number;
+    draft?: boolean;
+    kind?: string;
+    warnings?: string[];
+  }[];
+};
 export type ServiceHealth = {
   service: string;
   status: 'ok' | 'down';
@@ -16,9 +33,18 @@ export type ServiceHealth = {
 /** Healthy only when every service answers `status: ok` and is connected to the bus. */
 export const aggregateHealth = (services: ServiceHealth[]) => {
   // crouton problems (DB unreachable, invalid resource.json) count as degraded too
-  const ok = services.every((s) => s.status === 'ok' && s.bus === true && s.crouton?.ok !== false);
+  const ok = services.every((s) => s.status === 'ok' && s.bus === true && s.crouton?.summary.ok !== false);
   return { status: ok ? 'ok' : 'degraded', services } as const;
 };
+
+const pickCrouton = ({ version, croutonVersion, environment, summary, databases, resources }: CroutonStatus) => ({
+  version,
+  croutonVersion,
+  environment,
+  summary,
+  databases: databases ?? [],
+  resources: resources ?? [],
+});
 
 const getJson = async <T>(url: string) => {
   const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
@@ -30,13 +56,13 @@ const probe = async (url: string, service: string): Promise<ServiceHealth> => {
   try {
     const [health, crouton] = await Promise.all([
       getJson<{ status?: string; bus?: boolean }>(`${url}/health`),
-      getJson<{ summary?: CroutonStatus }>(`${url}/crouton/status.json`).catch(() => undefined),
+      getJson<CroutonStatus>(`${url}/crouton/status.json`).catch(() => undefined),
     ]);
     return {
       service,
       status: health.status === 'ok' ? 'ok' : 'down',
       bus: health.bus,
-      ...(crouton?.summary ? { crouton: crouton.summary } : {}),
+      ...(crouton?.summary ? { crouton: pickCrouton(crouton) } : {}),
     };
   } catch (e) {
     return { service, status: 'down', error: e instanceof Error ? e.message : String(e) };

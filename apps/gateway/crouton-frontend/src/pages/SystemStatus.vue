@@ -40,11 +40,11 @@
             <a
               v-if="s.crouton"
               class="badge"
-              :class="s.crouton.ok ? 'badge-success' : 'badge-error'"
+              :class="s.crouton.summary.ok ? 'badge-success' : 'badge-error'"
               :href="`${base(s.service)}/crouton/status.json`"
-              :title="`${s.crouton.databaseErrors} database, ${s.crouton.resourceErrors} resource errors, ${s.crouton.warningCount} warnings`"
+              :title="`${s.crouton.summary.databaseErrors} database, ${s.crouton.summary.resourceErrors} resource errors, ${s.crouton.summary.warningCount} warnings`"
             >
-              {{ s.crouton.ok ? 'ok' : `${s.crouton.databaseErrors + s.crouton.resourceErrors} errors` }}
+              {{ s.crouton.summary.ok ? 'ok' : `${s.crouton.summary.databaseErrors + s.crouton.summary.resourceErrors} errors` }}
             </a>
           </td>
           <td class="space-x-2 text-sm">
@@ -55,6 +55,13 @@
         </tr>
       </tbody>
     </table>
+
+    <section v-if="health" class="mt-8 space-y-2" aria-label="Crouton status per service">
+      <h2 class="text-lg font-semibold">Crouton status</h2>
+      <template v-for="s in health.services" :key="s.service">
+        <CroutonStatusDetails v-if="s.crouton" :service="s.service" :status="s.crouton" />
+      </template>
+    </section>
 
     <p class="mt-4 text-sm opacity-70">
       Refreshes every {{ REFRESH_SECONDS }} s<span v-if="checkedAt">, last checked {{ checkedAt }}</span>. Raw JSON:
@@ -67,10 +74,8 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 
 import { useApi } from '../api';
-
-type CroutonStatus = { ok: boolean; databaseErrors: number; resourceErrors: number; warningCount: number };
-type ServiceHealth = { service: string; status: 'ok' | 'down'; bus?: boolean; crouton?: CroutonStatus; error?: string };
-type Health = { status: 'ok' | 'degraded'; services: ServiceHealth[] };
+import CroutonStatusDetails from '../components/CroutonStatusDetails.vue';
+import type { Health } from '../types/health';
 
 const REFRESH_SECONDS = 10;
 
