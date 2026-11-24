@@ -16,5 +16,5 @@ The `EventBus` (`@annophis/events`) is provided by `AnnophisServiceModule`. Inje
   - **Handlers must be idempotent.** A throw means NAK and redelivery. Dedupe on `event.id` when the side effect is not idempotent.
   - Validate input with the contract schema: `X.parse(event)`.
 - **Admin/CRUD writes:** never publish from controllers. The Prisma client extension in `libs/events` emits entity events, so admin writes produce them too.
-- **Stream:** one JetStream stream `ANNOPHIS` on `annophis.>`. Inspect with `docker run --rm -it --network annophis-net natsio/nats-box nats sub -s nats://nats:4222 'annophis.>'`, or watch the `http://localhost:8222` monitoring page.
+- **Stream:** one JetStream stream `ANNOPHIS` on `annophis.>`. Inspect with `docker run --rm -it --network annophis-net natsio/nats-box nats sub -s nats://nats:4222 'annophis.>'`, or watch the `http://localhost:6482` monitoring page.
 - **Tests:** use `createEventBusMock()` from `@annophis/testing`. It records `publish` calls without NATS.
