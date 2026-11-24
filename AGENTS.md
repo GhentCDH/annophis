@@ -32,6 +32,7 @@ Each project has one `scope:*` tag and one `type:*` tag. The constraints live in
 | `type:app` | `type:lib`, `type:generated` (never another app) |
 | `type:lib` | `type:lib` only (never an app or generated code) |
 | `type:generated` | nothing |
+| `scope:e2e` + `type:e2e` | `scope:shared` libs only (`apps/e2e`) |
 
 Use the `annophis-lib` skill to pick the right lib kind.
 
@@ -52,6 +53,7 @@ pnpm nx run-many -t lint typecheck test build
 pnpm nx affected -t lint typecheck test build --base=origin/main
 pnpm nx run <svc>-backend:serve
 docker compose up
+pnpm nx e2e e2e      # Playwright, against the running stack
 ```
 
 ## Skills (`.claude/skills/`)
@@ -66,6 +68,7 @@ Plain markdown; any agent can read them.
 | `annophis-contract` | adding or changing a DTO or event schema |
 | `annophis-events` | publishing or subscribing to bus events |
 | `annophis-service-auth` | protecting endpoints, calling another service, debugging 401s |
+| `annophis-e2e` | Playwright tests in `apps/e2e` against the running stack |
 
 ## Libs
 

@@ -44,14 +44,17 @@ class HelloListener implements OnApplicationBootstrap {
 }
 
 /**
- * Wiring every Annophis backend imports once:
- * `AnnophisServiceModule.forRoot({ service: process.env.SERVICE_NAME! })`.
+ * Wiring every Annophis backend imports once: `AnnophisServiceModule.forRoot()`.
+ * The service name defaults to SERVICE_NAME; startup fails without one.
  * Provides the EventBus, /health and /hello, and ServiceAuthGuard as global guard.
  */
 @Global()
 @Module({})
 export class AnnophisServiceModule {
-  static forRoot(o: EventsOptions): DynamicModule {
+  static forRoot(opts: Partial<EventsOptions> = {}): DynamicModule {
+    const service = opts.service ?? process.env['SERVICE_NAME'];
+    if (!service) throw new Error('AnnophisServiceModule: set SERVICE_NAME (or pass { service })');
+    const o: EventsOptions = { ...opts, service };
     return {
       module: AnnophisServiceModule,
       controllers: [HealthController],
