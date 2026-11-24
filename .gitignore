@@ -37,3 +37,4 @@ generated/text-service-2/*/types/*
 !generated/text-service-2/*/types/package.json
 playwright-report/
 test-results/
+.auth/

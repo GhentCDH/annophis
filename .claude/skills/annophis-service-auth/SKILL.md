@@ -5,7 +5,9 @@ description: How Annophis backends authenticate callers (gateway JWT, service AP
 
 # Service auth
 
-`ServiceAuthGuard` (`@annophis/service-auth`) is installed as a global guard by `AnnophisServiceModule`. Every route is protected unless it is marked `@Public()`.
+`ServiceAuthGuard` (`@annophis/service-auth`) protects the **domain REST API** of a service. Put `@UseGuards(ServiceAuthGuard)` on every domain controller; `AnnophisServiceModule` provides the guard. Inside a guarded controller, mark exceptions with `@Public()`.
+
+It is deliberately not global. Crouton's own routes (admin CRUD, `/_app/auth/*`) are protected by crouton auth: Keycloak, shared `CROUTON_AUTH_SECRET` session tokens, and the `admin` guard in `auth-providers/keycloak/auth-provider.json`.
 
 | Caller | Sends | Accepted when |
 |---|---|---|

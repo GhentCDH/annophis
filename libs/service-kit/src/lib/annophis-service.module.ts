@@ -1,6 +1,5 @@
-import { Controller, Get, Global, Inject, Injectable, Logger, Module } from '@nestjs/common';
+import { Controller, Get, Global, Inject, Injectable, Logger, Module, UseGuards } from '@nestjs/common';
 import type { DynamicModule, OnApplicationBootstrap } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 
 import { EVENTS_OPTIONS, EventBus } from '@annophis/events';
 import type { EventsOptions } from '@annophis/events';
@@ -8,6 +7,7 @@ import { Public, ServiceAuthGuard } from '@annophis/service-auth';
 
 // Explicit @Inject everywhere: `pnpm dev` runs tsx (esbuild), which emits no decorator metadata.
 @Controller()
+@UseGuards(ServiceAuthGuard)
 class HealthController {
   constructor(
     @Inject(EventBus) private readonly bus: EventBus,
@@ -46,7 +46,8 @@ class HelloListener implements OnApplicationBootstrap {
 /**
  * Wiring every Annophis backend imports once: `AnnophisServiceModule.forRoot()`.
  * The service name defaults to SERVICE_NAME; startup fails without one.
- * Provides the EventBus, /health and /hello, and ServiceAuthGuard as global guard.
+ * Provides the EventBus and /health + /hello. ServiceAuthGuard is opt-in per domain controller
+ * (`@UseGuards(ServiceAuthGuard)`): crouton's own CRUD and `/_app/auth/*` routes use crouton auth instead.
  */
 @Global()
 @Module({})
@@ -62,9 +63,9 @@ export class AnnophisServiceModule {
         { provide: EVENTS_OPTIONS, useValue: o },
         EventBus,
         HelloListener,
-        { provide: APP_GUARD, useClass: ServiceAuthGuard },
+        ServiceAuthGuard,
       ],
-      exports: [EventBus],
+      exports: [EventBus, ServiceAuthGuard],
     };
   }
 }

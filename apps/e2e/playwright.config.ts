@@ -14,5 +14,8 @@ export default defineConfig({
     baseURL: process.env['GATEWAY_URL'] ?? 'http://localhost:6200',
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, dependencies: ['setup'] },
+  ],
 });

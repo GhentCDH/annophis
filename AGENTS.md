@@ -45,6 +45,14 @@ Use the `annophis-lib` skill to pick the right lib kind.
 - Code style: TypeScript strict, `type` over `interface`, arrow functions, `import type` for type-only imports.
 - Commit messages follow Conventional Commits.
 
+## Admin UIs (internal only)
+
+- **Login:** `http://localhost:6200` is the admin hub. One Keycloak login at the gateway, using the server-side flow with the confidential `annophis-gateway` client, gives a crouton session token.
+- **Access:** every backend accepts that token because all of them share `CROUTON_AUTH_SECRET`. Each backend's `auth-providers/keycloak/auth-provider.json` requires the `admin` realm role (`defaultSecurity`).
+- **Routing:** the hub links to `/<svc>/`. The gateway's Vite dev server proxies that to the service's own admin frontend (`base: '/<svc>/'`), which proxies `/<svc>/api` to its backend. The gateway's own DB admin is at `/admin`.
+- **Not public:** admin writes go straight to the database (events come from the Prisma extension, not controllers), so never expose the admin UIs publicly.
+- **Keycloak hostname:** `KEYCLOAK_URL=http://keycloak.localhost:6480` everywhere. `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer is the same for all of them.
+
 ## Commands
 
 ```sh

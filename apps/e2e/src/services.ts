@@ -14,3 +14,6 @@ export const services = Object.entries(ports).map(([name, port]) => ({
   name,
   url: process.env[`E2E_${name.toUpperCase().replace(/-/g, '_')}_URL`] ?? `http://localhost:${port}`,
 }));
+
+/** Services with a crouton admin UI under the gateway at `/<name>/` (gateway and ml-adapter have none there). */
+export const adminServices = services.filter(({ name }) => name !== 'gateway' && name !== 'ml-adapter');

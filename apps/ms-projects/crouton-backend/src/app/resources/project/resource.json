@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ghentcdh.github.io/crouton/schema/v1/resource.schema.json",
+  "schemaVersion": 1,
+  "draft": false,
+  "name": "project",
+  "route": "project",
+  "source": {
+    "model": "project",
+    "idType": "string",
+    "datasource": "default"
+  },
+  "openapi": {
+    "tag": "Project"
+  },
+  "title": "Project",
+  "sidebar": {
+    "hide": false
+  },
+  "operations": {
+    "findAll": true,
+    "findOne": true,
+    "create": true,
+    "update": true,
+    "patch": true,
+    "delete": true
+  },
+  "columns": {
+    "id": {
+      "idField": true,
+      "hiddenInTable": true,
+      "hiddenInForm": true,
+      "hiddenInView": true
+    },
+    "name": {
+      "fieldInput": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "fieldInput": {
+        "type": "textarea"
+      }
+    },
+    "createdAt": {
+      "hiddenInTable": true,
+      "hiddenInForm": true,
+      "creatable": false,
+      "updatable": false
+    },
+    "updatedAt": {
+      "hiddenInTable": true,
+      "hiddenInForm": true,
+      "creatable": false,
+      "updatable": false
+    }
+  }
+}

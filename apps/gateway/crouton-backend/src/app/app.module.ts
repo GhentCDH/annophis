@@ -15,7 +15,7 @@ import { resolve } from 'node:path';
         baseUrl: '',
       },
     ),
-    // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello, ServiceAuthGuard
+    // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello (ServiceAuthGuard is opt-in)
     AnnophisServiceModule.forRoot(),
   ],
 })

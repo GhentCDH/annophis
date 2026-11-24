@@ -44,7 +44,10 @@ services:
       KC_HEALTH_ENABLED: "true"
       # The JVM perf-data sampler (mmap in /tmp/hsperfdata) crashes with SIGBUS in some VMs (OrbStack/aarch64).
       JAVA_OPTS_APPEND: -XX:-UsePerfData
-      KC_HTTP_PORT: "6480"  # same port inside and outside, so the issuer URL works for browser and containers
+      # One issuer for browser, host and containers: browsers and Node resolve *.localhost to
+      # loopback, and inside annophis-net the alias below points at this container.
+      KC_HOSTNAME: http://keycloak.localhost:6480
+      KC_HTTP_PORT: "6480"  # same port inside and outside Docker, so the issuer URL works everywhere
     ports: ["6480:6480"]
     volumes:
       # No data volume: the realm is imported from the committed JSON on every start (a root-owned bind
@@ -56,4 +59,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
-    networks: [annophis-net]
+    networks:
+      annophis-net:
+        aliases: [keycloak.localhost]

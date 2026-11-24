@@ -10,16 +10,20 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, workspaceRoot, '');
 
   return {
+    // Served under the gateway at /<svc>/ (gateway vite proxy / Caddy), and standalone at the same path.
+    base: '/text-service-1/',
     plugins: [vue(), tailwindcss()],
     server: {
       port: Number(env.FRONTEND_PORT) || 4200,
       // Bind all interfaces inside docker so the mapped port is reachable.
       host: env.IS_DOCKER ? '0.0.0.0' : undefined,
+      // reached through the gateway proxy as <svc>-frontend inside docker
+      allowedHosts: true,
       proxy: {
-        '/api': {
+        '/text-service-1/api': {
           target: `http://${env.BACKEND_HOST || 'localhost'}:${env.BACKEND_PORT || 3000}`,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          rewrite: (path) => path.replace(/^\/text-service-1\/api/, ''),
         },
       },
     },

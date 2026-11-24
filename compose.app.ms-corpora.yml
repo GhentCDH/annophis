@@ -27,8 +27,8 @@ services:
     env_file: [apps/ms-corpora/.env]
     ports:
       - "${BACKEND_PORT:-6102}:${BACKEND_PORT:-6102}"
-    # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
-    command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-corpora; pnpm exec nx run ms-corpora-backend:serve"
+    # The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
+    command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-corpora; (cd apps/ms-corpora && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run ms-corpora-backend:serve"
     depends_on:
       postgres: { condition: service_healthy }
       nats: { condition: service_healthy }
