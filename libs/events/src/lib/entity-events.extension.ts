@@ -5,10 +5,13 @@ import type { EventBus } from './event-bus';
 const log = new Logger('EntityEvents');
 
 type Publisher = Pick<EventBus, 'publish'>;
-let activePublisher: Publisher | undefined;
+// On globalThis, not module scope: in production builds the data source (which applies the extension) is bundled
+// separately from main.js (which runs EventBus), so this module exists twice and module state would not be shared.
+const KEY = Symbol.for('annophis.entityEventPublisher');
+const registry = globalThis as typeof globalThis & { [KEY]?: Publisher };
 /** Called by EventBus once connected; the Prisma client lives outside Nest DI. */
 export const setEntityEventPublisher = (p: Publisher | undefined) => {
-  activePublisher = p;
+  registry[KEY] = p;
 };
 
 const VERBS: Record<string, 'created' | 'updated' | 'deleted'> = {
@@ -71,6 +74,7 @@ export const entityEvents = (service: string): AnyOperation => ({
             ? rows.map((row) => ({ data: row, subject: row.id == null ? undefined : String(row.id) }))
             : [{ data: { count: (result as { count?: number }).count, where: (args as { where?: unknown })?.where }, subject: undefined }];
 
+        const activePublisher = registry[KEY];
         if (!activePublisher) {
           log.warn(`${type}: no EventBus connected, event dropped`);
           return result;
