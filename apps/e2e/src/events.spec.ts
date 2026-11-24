@@ -23,14 +23,14 @@ test('an admin write emits an entity event on the bus', async ({ page, request }
     })();
 
     const headers = { Authorization: `Bearer ${await sessionToken(page)}` };
-    const created = await request.post('/ms-projects/api/project', { headers, data: { name } });
+    const created = await request.post('/api/ms-projects/project', { headers, data: { name } });
     expect(created.status()).toBe(201);
     const { id } = await created.json();
 
     const event = await received;
     expect(event).toMatchObject({ type: 'ms-projects.project.created', source: 'ms-projects', subject: id });
 
-    await request.delete(`/ms-projects/api/project/${id}`, { headers });
+    await request.delete(`/api/ms-projects/project/${id}`, { headers });
   } finally {
     await nc.close();
   }
