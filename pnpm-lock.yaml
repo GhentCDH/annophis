@@ -166,6 +166,12 @@ importers:
 
   .:
     dependencies:
+      '@nats-io/jetstream':
+        specifier: ^3.5.0
+        version: 3.5.0
+      '@nats-io/transport-node':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@nestjs/common':
         specifier: ^12.4.0
         version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@5.5.0)
@@ -175,6 +181,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^12.4.0
         version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@5.5.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@5.5.0)
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       reflect-metadata:
         specifier: ^0.2.0
         version: 0.2.2
@@ -276,7 +285,7 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(@types/node@22.20.5)(@vitest/coverage-v8@5.0.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       zod:
-        specifier: ^4.0.0
+        specifier: ^4.6.7
         version: 4.6.7
       zod-prisma-types:
         specifier: ^3.3.11
@@ -2324,6 +2333,26 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1 || 2.0.0-beta.2
       '@emnapi/runtime': ^1.7.1 || 2.0.0-beta.2
+
+  '@nats-io/jetstream@3.5.0':
+    resolution: {integrity: sha512-+auzo9mYvcsqq+H1ZBdSslkiPF96W4zbqpAT9Ni6ComcaA+j9cLpGGYYWpDqJCRrArZ8AxVAYvd7IxukZ/9z7w==}
+    engines: {node: '>= 22'}
+
+  '@nats-io/nats-core@3.5.0':
+    resolution: {integrity: sha512-iHsKhlzINdpL27pxvbHhBLRs4mnAKDfYrXMReBDNqvhKb/yVxz+Vz2rXujBAUiMsfOXFzixUK4Uu/qNnDRjZvA==}
+    engines: {node: '>= 22'}
+
+  '@nats-io/nkeys@2.1.0':
+    resolution: {integrity: sha512-vLMgwfPouG2Utp3hHUfdmMVEGEQ202tLES/pOAOfTJR5hwWGymm2mKuo3UMYv9kNw7awpcTBfEAljFqZcFm1lA==}
+    engines: {node: '>=18.0.0'}
+
+  '@nats-io/nuid@3.1.0':
+    resolution: {integrity: sha512-NC+JksVZl0zwpwsO6aIvsivqcqzgI2db0gCris/bSdZx56CdyniphijTfcjieUpR4HwZEiiid67NEviQ16sveA==}
+    engines: {node: '>= 20'}
+
+  '@nats-io/transport-node@3.5.0':
+    resolution: {integrity: sha512-5Ebt62tnQsrrb3p+aHJt0+zRHAkxbUhhD+8HnHNBTYRgXJ2X2LgvOD19EiiAISdW7yR4IQSmsdvpfX+I5oG5ew==}
+    engines: {node: '>= 22'}
 
   '@nestjs/common@12.6.0':
     resolution: {integrity: sha512-qlCebomQxvtNSdOQfgBryWwi2gjUYGTmXnwRP0vLp5xdKfR3DfAl4KRsvuXEbAUCBPUtHsgWSxh76IP1pc262A==}
@@ -5373,6 +5402,9 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
+  jose@6.2.18:
+    resolution: {integrity: sha512-doV4thUwgkrycJH4yLeqwTGIIZphHl+pk7CPReuMIhYhncmgzdko85MaCG4YQFTxqMFr1/oEH32tZuKKovcDEg==}
+
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
@@ -6849,6 +6881,9 @@ packages:
     resolution: {integrity: sha512-Yiex1Ovn8z2xPpOWckIiysV1SSyRMY9BkLF++q0yKiDxCqRhosKfMg3janKkiLBwZ5c/YryloKwGZcrEmtwxKw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
+
+  tweetnacl@1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -8613,6 +8648,27 @@ snapshots:
       '@emnapi/runtime': 2.0.0-beta.2
       '@tybys/wasm-util': 0.10.5
     optional: true
+
+  '@nats-io/jetstream@3.5.0':
+    dependencies:
+      '@nats-io/nats-core': 3.5.0
+
+  '@nats-io/nats-core@3.5.0':
+    dependencies:
+      '@nats-io/nkeys': 2.1.0
+      '@nats-io/nuid': 3.1.0
+
+  '@nats-io/nkeys@2.1.0':
+    dependencies:
+      tweetnacl: 1.0.3
+
+  '@nats-io/nuid@3.1.0': {}
+
+  '@nats-io/transport-node@3.5.0':
+    dependencies:
+      '@nats-io/nats-core': 3.5.0
+      '@nats-io/nkeys': 2.1.0
+      '@nats-io/nuid': 3.1.0
 
   '@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@5.5.0)':
     dependencies:
@@ -12236,6 +12292,8 @@ snapshots:
 
   jiti@2.7.0: {}
 
+  jose@6.2.18: {}
+
   joycon@3.1.1: {}
 
   js-tokens@10.0.1: {}
@@ -13879,6 +13937,8 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
+
+  tweetnacl@1.0.3: {}
 
   type-check@0.4.0:
     dependencies:

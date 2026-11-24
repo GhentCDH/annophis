@@ -63,8 +63,20 @@ Plain markdown; any agent can read them.
 | `crouton` | changing `resource.json`, `data-source.json` or `crouton.json` (synced by crouton, tracked in `.crouton/agent-files.json`) |
 | `annophis-add-service` | adding a new service under `apps/` |
 | `annophis-lib` | adding a shared lib under `libs/` |
+| `annophis-contract` | adding or changing a DTO or event schema |
+| `annophis-events` | publishing or subscribing to bus events |
+| `annophis-service-auth` | protecting endpoints, calling another service, debugging 401s |
 
-Contract, event and service-auth skills arrive together with those libs.
+## Libs
+
+| Lib | Tags | Holds |
+|---|---|---|
+| `@annophis/domain-types` | shared | Zod primitives: `TextUrn`, `TextSelector` (NFC code points), W3C `Annotation` |
+| `@annophis/contracts` | shared | REST DTOs and event schemas per service; the single source of truth |
+| `@annophis/events` | backend | `EventBus` (NATS JetStream), and later the Prisma extension that emits entity events |
+| `@annophis/service-auth` | backend | `ServiceAuthGuard`, `@Public()` |
+| `@annophis/service-kit` | backend | `AnnophisServiceModule.forRoot(...)`: EventBus, `/health`, `/hello`, global guard |
+| `@annophis/testing` | backend | `createEventBusMock()` and other test helpers |
 
 ## Ports
 
