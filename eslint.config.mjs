@@ -63,6 +63,9 @@ export default [
             },
             { sourceTag: 'type:lib', onlyDependOnLibsWithTags: ['type:lib'] },
             { sourceTag: 'type:generated', onlyDependOnLibsWithTags: [] },
+            // apps/e2e: Playwright only; may reuse shared contracts/fixtures
+            { sourceTag: 'scope:e2e', onlyDependOnLibsWithTags: ['scope:shared'] },
+            { sourceTag: 'type:e2e', onlyDependOnLibsWithTags: ['type:lib'] },
           ],
         },
       ],

@@ -33,7 +33,8 @@ pnpm nx g @nx/nest:library libs/<lib> --importPath=@annophis/<lib> \
   --unitTestRunner=vitest --linter=eslint \
   --tags=scope:backend,type:lib --no-interactive
 ```
-Then delete `"module": "commonjs"` from `libs/<lib>/tsconfig.json`. It clashes with `moduleResolution: bundler` in `tsconfig.base.json` (TS5095). Backends are bundled by tsup, so the base `module: preserve` is fine.
+
+Use `@nx/nest:library` for every backend lib, even a plain helper lib such as `testing`: it sets `experimentalDecorators`, which is needed as soon as the lib imports Nest code.
 
 **Shared lib (framework-free):**
 ```sh
@@ -45,6 +46,9 @@ pnpm nx g @nx/js:library libs/<lib> --importPath=@annophis/<lib> \
 **Frontend lib (Vue):** use `@nx/vue:library` with the same `--importPath` and `--tags=scope:frontend,type:lib`. Install `@nx/vue` first, at the same version as `nx`.
 
 ## 3. Finish
+
+- **Every kind:** delete `"module": "commonjs"` from `libs/<lib>/tsconfig.json`. Both `@nx/nest` and `@nx/js` add it, and it clashes with `moduleResolution: bundler` in `tsconfig.base.json` (TS5095). Backends are bundled by tsup, so the base `module: preserve` is fine.
+- Libs use `noPropertyAccessFromIndexSignature`, so read env as `process.env['NAME']`.
 
 - Export everything from `libs/<lib>/src/index.ts`.
 - Tests go in `*.spec.ts` next to the source.

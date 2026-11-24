@@ -2,5 +2,6 @@
   "$schema": "https://ghentcdh.github.io/crouton/schema/v1/crouton.schema.json",
   "title": "Ml Adapter",
   "resourcesDir": "crouton-backend/src/app/resources",
-  "dataSourcesDir": "crouton-backend/src/app/data-sources"
+  "dataSourcesDir": "crouton-backend/src/app/data-sources",
+  "authProvidersDir": "crouton-backend/src/app/auth-providers"
 }

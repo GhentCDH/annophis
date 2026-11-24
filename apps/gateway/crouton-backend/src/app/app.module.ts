@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CroutonApiModule } from '@ghentcdh/crouton-api';
+
+import { AnnophisServiceModule } from '@annophis/service-kit';
 import { resolve } from 'node:path';
 
 @Module({
@@ -13,6 +15,8 @@ import { resolve } from 'node:path';
         baseUrl: '',
       },
     ),
+    // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello (ServiceAuthGuard is opt-in)
+    AnnophisServiceModule.forRoot(),
   ],
 })
 export class AppModule {}

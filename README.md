@@ -19,3 +19,59 @@
 Development by [Ghent Centre for Digital Humanities - Ghent University](https://www.ghentcdh.ugent.be/). Funded by the [GhentCDH research projects](https://www.ghentcdh.ugent.be/projects).
 
 <img src="https://www.ghentcdh.ugent.be/ghentcdh_logo_blue_text_transparent_bg_landscape.svg" alt="Landscape" width="500">
+
+## Development
+
+Requirements: Node 24, pnpm ≥ 12, Docker.
+
+```sh
+pnpm install
+docker compose up            # Postgres, NATS, Keycloak and every service (dev mode, hot reload)
+```
+
+Annophis only uses ports 6100–6499 (see the Ports section in [AGENTS.md](AGENTS.md)), so it runs next to other local stacks.
+
+| What | URL |
+|---|---|
+| Admin UI (all services) | http://localhost:6200 — log in as `admin`/`admin` (Keycloak) |
+| Service backends | http://localhost:6100 (gateway), 6101–6104 (`ms-*`), 6110/6111 (text services), 6120 (ml-adapter) |
+| Keycloak | http://localhost:6480 (console `admin`/`admin`; realm `annophis`, users `admin`/`admin`, `viewer`/`viewer`) |
+| NATS monitoring | http://localhost:6482 |
+| Postgres | `localhost:6432`, database `annophis`, one schema + user per service (password `dev`) |
+
+To run infra in Docker and the apps on the host (much lighter than 15 dev containers):
+
+```sh
+docker compose up -d postgres nats keycloak
+for d in apps/*/; do [ -f "$d.env" ] || cp "$d.env.example" "$d.env"; done   # first time
+pnpm dev
+```
+
+Docker reads each `apps/<svc>/.env.example` (committed dev defaults), optionally overridden by `apps/<svc>/.env`.
+
+Postgres reads its init files only on an empty volume. To reset: `docker compose down && rm -rf var`. Keycloak keeps no data: it re-imports `docker/keycloak/annophis-realm.json` on every start, so export console changes (below) or they are lost.
+
+### Changing the Keycloak realm
+
+Edit the realm in the console, then export it back to `docker/keycloak/annophis-realm.json`:
+
+```sh
+docker compose stop keycloak
+docker compose run --rm --entrypoint /opt/keycloak/bin/kc.sh \
+  -v "$PWD/docker/keycloak:/opt/keycloak/data/import" keycloak \
+  export --dir /opt/keycloak/data/import --realm annophis --users realm_file
+docker compose start keycloak
+```
+
+**The admin UIs are internal tools.** They write to the databases directly. Only users with the Keycloak `admin` role get in, and they must never be exposed publicly.
+
+### CI
+
+| Workflow | When | What |
+|---|---|---|
+| `ci.yml` | every PR, push to main | lint, typecheck, test, build (crouton shared CI) |
+| `e2e.yml` | every PR, push to main | infra in Docker + all services via `pnpm dev`, then Playwright (`apps/e2e`); report uploaded on failure |
+| `docker-build.yml` | tag `v*` | one image per service to `ghcr.io/<owner>/annophis-<svc>`, then a GitHub release from Conventional Commits |
+| `labeler.yml`, `pr-title.yml` | PRs | labels from branch/files/title; title must be a Conventional Commit |
+
+The development guide for coding agents is [AGENTS.md](AGENTS.md).

@@ -3,34 +3,25 @@ networks:
     name: annophis-net
 
 services:
-  text-service-1-frontend:
-    build:
-      context: .
-      dockerfile: apps/text-service-1/Dockerfile.dev
-    env_file: [apps/text-service-1/.env]
-    ports:
-      - "${FRONTEND_PORT:-4210}:${FRONTEND_PORT:-4210}"
-    environment:
-      - BACKEND_HOST=text-service-1-backend
-      - NX_COMMAND=text-service-1-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   text-service-1-backend:
     build:
       context: .
       dockerfile: apps/text-service-1/Dockerfile.dev
-    env_file: [apps/text-service-1/.env]
+    env_file:
+      - apps/text-service-1/.env.example  # committed dev defaults, so a fresh clone starts
+      - { path: apps/text-service-1/.env, required: false }  # local overrides
     ports:
-      - "${BACKEND_PORT:-3010}:${BACKEND_PORT:-3010}"
-    # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
-    command: sh -c "pnpm exec crouton generate --yes --cwd apps/text-service-1; pnpm exec nx run text-service-1-backend:serve"
+      - "${BACKEND_PORT:-6110}:${BACKEND_PORT:-6110}"
+    # nx serve needs apps/<svc>/.env (created from .env.example on first start). The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
+    command: sh -c "[ -f apps/text-service-1/.env ] || cp apps/text-service-1/.env.example apps/text-service-1/.env; pnpm exec crouton generate --yes --cwd apps/text-service-1; (cd apps/text-service-1 && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run text-service-1-backend:serve"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
     environment:
       - NX_COMMAND=text-service-1-backend:serve
+      # .env points at localhost for `pnpm dev`; inside the network use service hostnames
+      - DATABASE_URL=postgresql://text_service_1:dev@postgres:5432/annophis?schema=text_service_1
+      - NATS_URL=nats://nats:4222
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:

@@ -1,0 +1,64 @@
+# Local infrastructure for Annophis (dev only — credentials are not secrets).
+# Started together with all services by `docker compose up` (see compose.yml).
+networks:
+  annophis-net:
+    name: annophis-net
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: annophis
+      POSTGRES_PASSWORD: annophis
+      POSTGRES_DB: annophis
+    ports: ["6432:5432"]  # Annophis infra range 6400–6499 (see AGENTS.md)
+    volumes:
+      - ./var/pgdata:/var/lib/postgresql/data
+      # one user + schema per service; runs only on an empty volume (rm -rf var/pgdata to re-run)
+      - ./docker/init-data:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U annophis -d annophis"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [annophis-net]
+
+  nats:
+    image: nats:2-alpine
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    ports: ["6422:4222", "6482:8222"]
+    volumes: ["./var/nats:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [annophis-net]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      # The JVM perf-data sampler (mmap in /tmp/hsperfdata) crashes with SIGBUS in some VMs (OrbStack/aarch64).
+      JAVA_OPTS_APPEND: -XX:-UsePerfData
+      # One issuer for browser, host and containers: browsers and Node resolve *.localhost to
+      # loopback, and inside annophis-net the alias below points at this container.
+      KC_HOSTNAME: http://keycloak.localhost:6480
+      KC_HTTP_PORT: "6480"  # same port inside and outside Docker, so the issuer URL works everywhere
+    ports: ["6480:6480"]
+    volumes:
+      # No data volume: the realm is imported from the committed JSON on every start (a root-owned bind
+      # mount is not writable for the keycloak user on Linux). Export console changes to the JSON (README).
+      - ./docker/keycloak:/opt/keycloak/data/import:ro
+    healthcheck:
+      # the image has no curl/wget; probe the management port with bash
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      annophis-net:
+        aliases: [keycloak.localhost]

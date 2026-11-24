@@ -8,7 +8,7 @@ Entry point for every coding agent (Claude, Codex, Copilot, Cursor). `CLAUDE.md`
 apps/<svc>/                one crouton project per service
   crouton.json             resource/data-source dirs for this service
   crouton-backend/         NestJS (crouton-api)
-  crouton-frontend/        Vue (crouton-vue), the service's DB admin; absent for API-only services
+  crouton-frontend/        gateway only: the single admin UI (crouton-vue) for every service
   prisma/default/          schema.prisma + prisma.config.ts
   .env.example             copy to .env
 libs/<lib>/                shared TypeScript, imported as @annophis/<lib>
@@ -32,6 +32,7 @@ Each project has one `scope:*` tag and one `type:*` tag. The constraints live in
 | `type:app` | `type:lib`, `type:generated` (never another app) |
 | `type:lib` | `type:lib` only (never an app or generated code) |
 | `type:generated` | nothing |
+| `scope:e2e` + `type:e2e` | `scope:shared` libs only (`apps/e2e`) |
 
 Use the `annophis-lib` skill to pick the right lib kind.
 
@@ -44,6 +45,18 @@ Use the `annophis-lib` skill to pick the right lib kind.
 - Code style: TypeScript strict, `type` over `interface`, arrow functions, `import type` for type-only imports.
 - Commit messages follow Conventional Commits.
 
+## Admin UIs (internal only)
+
+- **One admin UI:** `http://localhost:6200` (the gateway's crouton frontend) is the only frontend. Services have no frontend of their own.
+- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. Every backend accepts it (shared `CROUTON_AUTH_SECRET`) and requires the `admin` realm role (`auth-providers/keycloak/auth-provider.json`, `defaultSecurity`).
+- **Gateway facade** (`apps/gateway/crouton-backend/src/admin-facade.ts`):
+  - `GET /_app/layout` merges the gateway's sidebar with one group per service. Leaf ids become `<svc>.<id>` and routes `<svc>/<route>` (`merge-layouts.ts`); services are listed only for admins.
+  - `/<svc>/*` is reverse-proxied to that service with the prefix stripped and `Authorization` forwarded.
+  - Each service sets `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir`, so its CRUD/relation URIs carry the prefix.
+  - The service list (name, sidebar title, port) lives in `apps/gateway/crouton-backend/src/services.ts`.
+- **Not public:** admin writes go straight to the database (events come from the Prisma extension, not controllers), so never expose the admin UIs publicly.
+- **Keycloak hostname:** `KEYCLOAK_URL=http://keycloak.localhost:6480` everywhere. `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer is the same for all of them.
+
 ## Commands
 
 ```sh
@@ -52,6 +65,7 @@ pnpm nx run-many -t lint typecheck test build
 pnpm nx affected -t lint typecheck test build --base=origin/main
 pnpm nx run <svc>-backend:serve
 docker compose up
+pnpm nx e2e e2e      # Playwright, against the running stack
 ```
 
 ## Skills (`.claude/skills/`)
@@ -63,25 +77,55 @@ Plain markdown; any agent can read them.
 | `crouton` | changing `resource.json`, `data-source.json` or `crouton.json` (synced by crouton, tracked in `.crouton/agent-files.json`) |
 | `annophis-add-service` | adding a new service under `apps/` |
 | `annophis-lib` | adding a shared lib under `libs/` |
+| `annophis-contract` | adding or changing a DTO or event schema |
+| `annophis-events` | publishing or subscribing to bus events |
+| `annophis-service-auth` | protecting endpoints, calling another service, debugging 401s |
+| `annophis-e2e` | Playwright tests in `apps/e2e` against the running stack |
 
-Contract, event and service-auth skills arrive together with those libs.
+## Libs
+
+| Lib | Tags | Holds |
+|---|---|---|
+| `@annophis/domain-types` | shared | Zod primitives: `TextUrn`, `TextSelector` (NFC code points), W3C `Annotation` |
+| `@annophis/contracts` | shared | REST DTOs and event schemas per service; the single source of truth |
+| `@annophis/events` | backend | `EventBus` (NATS JetStream) and `withEntityEvents()`, the Prisma extension that emits `<svc>.<model>.<verb>` on every write |
+| `@annophis/service-auth` | backend | `ServiceAuthGuard`, `@Public()` |
+| `@annophis/service-kit` | backend | `AnnophisServiceModule.forRoot(...)`: EventBus, `/health`, `/hello`, global guard |
+| `@annophis/testing` | backend | `createEventBusMock()` and other test helpers |
 
 ## Ports
 
+Annophis owns fixed port ranges so it can run next to other local projects (which use 3000/4200/5432/8080 and friends). **Always pick new ports inside these ranges and keep the suffix per service the same across ranges.**
+
+| Range | Use |
+|---|---|
+| 6100–6199 | service backends (`BACKEND_PORT`) |
+| 6200–6299 | frontends: the gateway admin UI (6200); reserved for future UIs |
+| 6400–6499 | infra host ports |
+
 | Service | Backend | Frontend |
 |---|---|---|
-| gateway | 3000 | 4200 |
-| ms-projects | 3001 | 4201 |
-| ms-corpora | 3002 | 4202 |
-| ms-annotation | 3003 | 4203 |
-| ms-metadata | 3004 | 4204 |
-| text-service-1 | 3010 | 4210 |
-| text-service-2 | 3011 | 4211 |
-| ml-adapter | 3020 | none (API only) |
+| gateway | 6100 | 6200 (the admin UI for all services) |
+| ms-projects | 6101 | — |
+| ms-corpora | 6102 | — |
+| ms-annotation | 6103 | — |
+| ms-metadata | 6104 | — |
+| text-service-1 | 6110 | — |
+| text-service-2 | 6111 | — |
+| ml-adapter | 6120 | — |
 
-Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name.
+| Infra | Host port | Inside Docker |
+|---|---|---|
+| Postgres (DB `annophis`) | 6432 | `postgres:5432` |
+| NATS | 6422 | `nats:4222` |
+| NATS monitoring | 6482 | `nats:8222` |
+| Keycloak (realm `annophis`) | 6480 | `keycloak.localhost:6480` (same port inside and out) |
 
-**Root agent files (crouton issue 16).** `.claude/skills/crouton`, `.cursor/rules/crouton.mdc` and the crouton block below are written by crouton. They name *one* project's paths. For any service, read `apps/<svc>/crouton.json` for its resources and data-sources dirs.
+The next free suffixes are `x05`–`x09` for domain `ms-*` services, `x12`+ for text services and `x21`+ for adapters.
+
+Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name (password `dev`). `docker/init-data/01-schemas.sql` creates them. Inside Docker, the compose files override `DATABASE_URL` and `NATS_URL` to use the `postgres` and `nats` hosts; `.env` uses `localhost` for `pnpm dev`.
+
+**Root agent files (GhentCDH/crouton#690).** `.claude/skills/crouton`, `.cursor/rules/crouton.mdc` and the crouton block below are written by crouton. They name *one* project's paths. For any service, read `apps/<svc>/crouton.json` for its resources and data-sources dirs.
 
 <!-- crouton configuration start -->
 <!-- Leave the start & end comments to automatically receive updates. -->

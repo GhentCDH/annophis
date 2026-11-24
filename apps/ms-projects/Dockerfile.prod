@@ -28,7 +28,7 @@ COPY . .
 RUN cd apps/ms-projects && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
 
 # Build applications
-RUN npx nx build ms-projects-backend && npx nx build ms-projects-frontend
+RUN npx nx build ms-projects-backend
 
 # Create flat node_modules for backend (no pnpm symlinks)
 RUN pnpm --filter @ms-projects/backend deploy --legacy --prod /app/deployed-backend
@@ -36,11 +36,21 @@ RUN pnpm --filter @ms-projects/backend deploy --legacy --prod /app/deployed-back
 # Transpile resource & data-source .ts → .js for runtime require()
 COPY apps/ms-projects/crouton-backend/src/app/resources /app/dist/apps/ms-projects/crouton-backend/resources
 COPY apps/ms-projects/crouton-backend/src/app/data-sources /app/dist/apps/ms-projects/crouton-backend/data-sources
-RUN find /app/dist/apps/ms-projects/crouton-backend/resources /app/dist/apps/ms-projects/crouton-backend/data-sources -name '*.ts' \
+RUN find /app/dist/apps/ms-projects/crouton-backend/resources -name '*.ts' \
     | while read f; do \
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
-    && find /app/dist/apps/ms-projects/crouton-backend/resources /app/dist/apps/ms-projects/crouton-backend/data-sources -name '*.ts' -delete
+    && find /app/dist/apps/ms-projects/crouton-backend/resources -name '*.ts' -delete
+# Data sources import @annophis/* libs (tsconfig paths, not packages): bundle those in, keep npm packages and the
+# generated client (copied into node_modules below) external.
+RUN find apps/ms-projects/crouton-backend/src/app/data-sources -name 'index.ts' \
+    | while read f; do \
+        out="/app/dist/apps/ms-projects/crouton-backend/data-sources/${f#apps/ms-projects/crouton-backend/src/app/data-sources/}"; \
+        npx esbuild "$f" --bundle --packages=external --external:'@ms-projects/*' \
+          --tsconfig=apps/ms-projects/crouton-backend/tsconfig.json \
+          --outfile="${out%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/dist/apps/ms-projects/crouton-backend/data-sources -name '*.ts' -delete
 
 # Transpile generated types .ts → .js
 RUN find /app/generated/ms-projects/default/types/src -name '*.ts' \
@@ -54,8 +64,6 @@ RUN find /app/generated/ms-projects/default/types/src -name '*.ts' \
 # Stage 3: Production
 # ========================================================
 FROM node:24-alpine
-
-RUN apk add --no-cache caddy ca-certificates openssl
 
 WORKDIR /app
 
@@ -72,17 +80,11 @@ COPY --from=build /app/generated/ms-projects/default/client ./generated/client
 # runtime-required data-sources resolve `@ms-projects/generated-default-client`.
 COPY --from=build /app/generated/ms-projects/default/client ./node_modules/@ms-projects/generated-default-client
 COPY --from=build /app/generated/ms-projects/default/types ./node_modules/@ms-projects/generated-default-types
-COPY --from=build /app/apps/ms-projects/crouton-frontend/dist /srv/frontend
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ms-projects/crouton.json apps/ms-projects/crouton.enums.json ./
 
-COPY apps/ms-projects/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
-COPY apps/ms-projects/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+EXPOSE 3000
 
-EXPOSE 9000 3000
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+CMD ["node", "backend/main.js"]
 

@@ -44,3 +44,8 @@ onlyBuiltDependencies:
   - esbuild
   - nx
   - prisma
+
+# One supports-color so debug (and with it @nestjs/*) resolves to a single variant;
+# otherwise libs/ and the backends load two @nestjs/common copies (breaks DI).
+overrides:
+  supports-color: 7.2.0

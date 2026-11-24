@@ -113,7 +113,27 @@
       ],
       "@text-service-2/generated-default-client/*": [
         "./generated/text-service-2/default/client/*"
+      ],
+      "@annophis/domain-types": [
+        "./libs/domain-types/src/index.ts"
+      ],
+      "@annophis/contracts": [
+        "./libs/contracts/src/index.ts"
+      ],
+      "@annophis/events": [
+        "./libs/events/src/index.ts"
+      ],
+      "@annophis/service-auth": [
+        "./libs/service-auth/src/index.ts"
+      ],
+      "@annophis/service-kit": [
+        "./libs/service-kit/src/index.ts"
+      ],
+      "@annophis/testing": [
+        "./libs/testing/src/index.ts"
       ]
-    }
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

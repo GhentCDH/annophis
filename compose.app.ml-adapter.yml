@@ -7,13 +7,21 @@ services:
     build:
       context: .
       dockerfile: apps/ml-adapter/Dockerfile.dev
-    env_file: [apps/ml-adapter/.env]
+    env_file:
+      - apps/ml-adapter/.env.example  # committed dev defaults, so a fresh clone starts
+      - { path: apps/ml-adapter/.env, required: false }  # local overrides
     ports:
-      - "${BACKEND_PORT:-3020}:${BACKEND_PORT:-3020}"
-    # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
-    command: sh -c "pnpm exec crouton generate --yes --cwd apps/ml-adapter; pnpm exec nx run ml-adapter-backend:serve"
+      - "${BACKEND_PORT:-6120}:${BACKEND_PORT:-6120}"
+    # nx serve needs apps/<svc>/.env (created from .env.example on first start). The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
+    command: sh -c "[ -f apps/ml-adapter/.env ] || cp apps/ml-adapter/.env.example apps/ml-adapter/.env; pnpm exec crouton generate --yes --cwd apps/ml-adapter; (cd apps/ml-adapter && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run ml-adapter-backend:serve"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
     environment:
       - NX_COMMAND=ml-adapter-backend:serve
+      # .env points at localhost for `pnpm dev`; inside the network use service hostnames
+      - DATABASE_URL=postgresql://ml_adapter:dev@postgres:5432/annophis?schema=ml_adapter
+      - NATS_URL=nats://nats:4222
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:

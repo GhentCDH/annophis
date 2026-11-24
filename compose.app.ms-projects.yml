@@ -3,34 +3,25 @@ networks:
     name: annophis-net
 
 services:
-  ms-projects-frontend:
-    build:
-      context: .
-      dockerfile: apps/ms-projects/Dockerfile.dev
-    env_file: [apps/ms-projects/.env]
-    ports:
-      - "${FRONTEND_PORT:-4201}:${FRONTEND_PORT:-4201}"
-    environment:
-      - BACKEND_HOST=ms-projects-backend
-      - NX_COMMAND=ms-projects-frontend:dev
-      - WATCHPACK_POLLING=true
-      - IS_DOCKER=true
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.nx
-    networks: [annophis-net]
   ms-projects-backend:
     build:
       context: .
       dockerfile: apps/ms-projects/Dockerfile.dev
-    env_file: [apps/ms-projects/.env]
+    env_file:
+      - apps/ms-projects/.env.example  # committed dev defaults, so a fresh clone starts
+      - { path: apps/ms-projects/.env, required: false }  # local overrides
     ports:
-      - "${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}"
-    # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
-    command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-projects; pnpm exec nx run ms-projects-backend:serve"
+      - "${BACKEND_PORT:-6101}:${BACKEND_PORT:-6101}"
+    # nx serve needs apps/<svc>/.env (created from .env.example on first start). The Prisma client is git-ignored: generate it, apply migrations, then serve (serve even if a step fails; errors show on /crouton/status).
+    command: sh -c "[ -f apps/ms-projects/.env ] || cp apps/ms-projects/.env.example apps/ms-projects/.env; pnpm exec crouton generate --yes --cwd apps/ms-projects; (cd apps/ms-projects && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts); pnpm exec nx run ms-projects-backend:serve"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
     environment:
       - NX_COMMAND=ms-projects-backend:serve
+      # .env points at localhost for `pnpm dev`; inside the network use service hostnames
+      - DATABASE_URL=postgresql://ms_projects:dev@postgres:5432/annophis?schema=ms_projects
+      - NATS_URL=nats://nats:4222
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:

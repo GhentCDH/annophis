@@ -1,0 +1,79 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm }
+
+      # Infra in Docker; apps on the runner (one Nx process, much lighter than 15 dev containers).
+      - name: Start Postgres, NATS and Keycloak
+        run: |
+          echo "127.0.0.1 keycloak.localhost" | sudo tee -a /etc/hosts
+          docker compose up -d --wait postgres nats keycloak || { docker compose logs postgres nats keycloak | tail -200; exit 1; }
+
+      - name: Install and generate
+        run: |
+          pnpm install --frozen-lockfile
+          for p in apps/*/crouton.json; do
+            d=$(dirname "$p")
+            # generate needs some DATABASE_URL to load prisma.config.ts (no connection is made)
+            DATABASE_URL=postgresql://ci:ci@localhost:5432/ci pnpm crouton update resources --yes --skip-pull --project "$d"
+            (cd "$d" && set -a && . ./.env.example && set +a && pnpm exec prisma migrate deploy --config prisma/default/prisma.config.ts)
+          done
+          pnpm exec playwright install --with-deps chromium
+
+      - name: Start all services
+        run: |
+          # nx serve targets read apps/<svc>/.env
+          for d in apps/*/; do [ -f "$d.env.example" ] && cp "$d.env.example" "$d.env"; done
+          nohup pnpm dev > dev.log 2>&1 &
+          for url in http://localhost:6200 http://localhost:{6100,6101,6102,6103,6104,6110,6111,6120}/health; do
+            for i in $(seq 1 90); do curl -sf -o /dev/null "$url" && break; sleep 2; done
+            curl -sf -o /dev/null "$url" || { echo "::error::$url not up"; tail -100 dev.log; exit 1; }
+          done
+
+      - name: Playwright
+        run: pnpm nx e2e e2e
+        env: { CI: 'true' }
+
+      - name: Diagnose
+        if: failure()
+        run: |
+          echo "--- login chain"
+          curl -s -i http://localhost:6200/api/_app/auth | head -20 || true
+          curl -s -i http://localhost:6200/api/_app/auth/keycloak/login | head -12 || true
+          curl -s -o /dev/null -w "keycloak discovery: %{http_code}\n" http://keycloak.localhost:6480/realms/annophis/.well-known/openid-configuration || true
+          echo "--- dev.log (tail)"
+          tail -150 dev.log | sed 's/\x1b\[[0-9;]*m//g'
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            apps/e2e/playwright-report
+            apps/e2e/test-results
+            dev.log
+          retention-days: 7
+
+      - name: Stop infra
+        if: always()
+        run: docker compose down -v

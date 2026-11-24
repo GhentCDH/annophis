@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CroutonApiModule } from '@ghentcdh/crouton-api';
+
+import { AnnophisServiceModule } from '@annophis/service-kit';
 import { resolve } from 'node:path';
 
 @Module({
@@ -10,9 +12,12 @@ import { resolve } from 'node:path';
       resolve(__dirname, 'resources'),
       resolve(__dirname, 'data-sources'),
       {
-        baseUrl: '',
+        // served to the gateway's single admin UI under /text-service-2 (gateway proxy strips the prefix)
+        baseUrl: '/text-service-2',
       },
     ),
+    // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello (ServiceAuthGuard is opt-in)
+    AnnophisServiceModule.forRoot(),
   ],
 })
 export class AppModule {}
