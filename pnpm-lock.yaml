@@ -395,7 +395,812 @@ importers:
         specifier: 3.3.14
         version: 3.3.14(typescript@5.9.3)
 
+  apps/ml-adapter/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@ml-adapter/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ml-adapter/default/types
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/ms-annotation/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@ms-annotation/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-annotation/default/types
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/ms-annotation/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@ms-annotation/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-annotation/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
+  apps/ms-corpora/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@ms-corpora/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-corpora/default/types
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/ms-corpora/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@ms-corpora/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-corpora/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
+  apps/ms-metadata/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@ms-metadata/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-metadata/default/types
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/ms-metadata/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@ms-metadata/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-metadata/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
+  apps/ms-projects/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@ms-projects/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-projects/default/types
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/ms-projects/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@ms-projects/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/ms-projects/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
+  apps/text-service-1/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@text-service-1/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/text-service-1/default/types
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/text-service-1/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@text-service-1/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/text-service-1/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
+  apps/text-service-2/crouton-backend:
+    dependencies:
+      '@ghentcdh/crouton-api':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(@nestjs/swagger@12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(@prisma/internals@7.10.1(magicast@0.5.5)(typescript@5.9.3))(zod@4.6.7)
+      '@nestjs/common':
+        specifier: ^12.4.0
+        version: 12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/config':
+        specifier: ^12.1.1
+        version: 12.1.1(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^12.4.0
+        version: 12.6.0(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(rxjs@7.8.2)(supports-color@7.2.0)
+      '@nestjs/swagger':
+        specifier: ^12.1.1
+        version: 12.1.2(@nestjs/common@12.6.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.6.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@prisma/adapter-pg':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: ^7.0.0
+        version: 7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.0.0
+        version: 7.10.1
+      '@text-service-2/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/text-service-2/default/types
+      dotenv:
+        specifier: ^18.0.10
+        version: 18.0.10
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.1
+      reflect-metadata:
+        specifier: ^0.2.0
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.0.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      prisma:
+        specifier: ^7.0.0
+        version: 7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      zod-prisma-types:
+        specifier: ^3.3.11
+        version: 3.3.11(@prisma/client@7.10.1(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.10.1(@types/node@26.6.6)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(zod@4.6.7)
+
+  apps/text-service-2/crouton-frontend:
+    dependencies:
+      '@ghentcdh/crouton-vue':
+        specifier: 0.2.0-rc.4
+        version: 0.2.0-rc.4(@floating-ui/dom@1.8.0)(@ghentcdh/crouton-core@0.2.0-rc.4(@jsonforms/core@3.8.0)(zod@4.6.7))(@jsonforms/core@3.8.0)(@tiptap/core@3.35.0(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)(axios@1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0))(vee-validate@5.0.0-beta.0(vue@3.5.46(typescript@5.9.3)))(vue-router@5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3)))(vue@3.5.46(typescript@5.9.3))(zod@4.6.7)
+      '@text-service-2/generated-default-types':
+        specifier: workspace:*
+        version: link:../../../generated/text-service-2/default/types
+      axios:
+        specifier: ^1.7.0
+        version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      vee-validate:
+        specifier: 5.0.0-beta.0
+        version: 5.0.0-beta.0(vue@3.5.46(typescript@5.9.3))
+      vue:
+        specifier: ^3.5.45
+        version: 3.5.46(typescript@5.9.3)
+      vue-router:
+        specifier: ^5.4.0
+        version: 5.5.1(@vue/compiler-sfc@3.5.46)(esbuild@0.28.2)(rolldown@1.2.19)(rollup@4.68.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.5
+        version: 4.3.5(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.10
+        version: 6.0.11(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vue@3.5.46(typescript@5.9.3))
+      daisyui:
+        specifier: ^5.6.0
+        version: 5.8.2
+      eslint-plugin-vue:
+        specifier: ^10.12.0
+        version: 10.12.1(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(vue-eslint-parser@10.4.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))
+      tailwindcss:
+        specifier: ^4.3.5
+        version: 4.3.5
+      typescript:
+        specifier: ~5.9.0
+        version: 5.9.3
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vue-tsc:
+        specifier: 3.3.14
+        version: 3.3.14(typescript@5.9.3)
+
   generated/gateway/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/ml-adapter/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/ms-annotation/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/ms-corpora/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/ms-metadata/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/ms-projects/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/text-service-1/default/types:
+    dependencies:
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.7
+
+  generated/text-service-2/default/types:
     dependencies:
       tslib:
         specifier: ^2.9.1

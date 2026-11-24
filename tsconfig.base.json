@@ -4,7 +4,9 @@
     "declarationMap": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "preserve",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -16,10 +18,102 @@
     "target": "es2022",
     "baseUrl": ".",
     "paths": {
-      "@gateway/generated-default-types": ["./generated/gateway/default/types/src"],
-      "@gateway/generated-default-types/*": ["./generated/gateway/default/types/src/*"],
-      "@gateway/generated-default-client": ["./generated/gateway/default/client"],
-      "@gateway/generated-default-client/*": ["./generated/gateway/default/client/*"]
+      "@gateway/generated-default-types": [
+        "./generated/gateway/default/types/src"
+      ],
+      "@gateway/generated-default-types/*": [
+        "./generated/gateway/default/types/src/*"
+      ],
+      "@gateway/generated-default-client": [
+        "./generated/gateway/default/client"
+      ],
+      "@gateway/generated-default-client/*": [
+        "./generated/gateway/default/client/*"
+      ],
+      "@ml-adapter/generated-default-types": [
+        "./generated/ml-adapter/default/types/src"
+      ],
+      "@ml-adapter/generated-default-types/*": [
+        "./generated/ml-adapter/default/types/src/*"
+      ],
+      "@ml-adapter/generated-default-client": [
+        "./generated/ml-adapter/default/client"
+      ],
+      "@ml-adapter/generated-default-client/*": [
+        "./generated/ml-adapter/default/client/*"
+      ],
+      "@ms-projects/generated-default-types": [
+        "./generated/ms-projects/default/types/src"
+      ],
+      "@ms-projects/generated-default-types/*": [
+        "./generated/ms-projects/default/types/src/*"
+      ],
+      "@ms-projects/generated-default-client": [
+        "./generated/ms-projects/default/client"
+      ],
+      "@ms-projects/generated-default-client/*": [
+        "./generated/ms-projects/default/client/*"
+      ],
+      "@ms-corpora/generated-default-types": [
+        "./generated/ms-corpora/default/types/src"
+      ],
+      "@ms-corpora/generated-default-types/*": [
+        "./generated/ms-corpora/default/types/src/*"
+      ],
+      "@ms-corpora/generated-default-client": [
+        "./generated/ms-corpora/default/client"
+      ],
+      "@ms-corpora/generated-default-client/*": [
+        "./generated/ms-corpora/default/client/*"
+      ],
+      "@ms-annotation/generated-default-types": [
+        "./generated/ms-annotation/default/types/src"
+      ],
+      "@ms-annotation/generated-default-types/*": [
+        "./generated/ms-annotation/default/types/src/*"
+      ],
+      "@ms-annotation/generated-default-client": [
+        "./generated/ms-annotation/default/client"
+      ],
+      "@ms-annotation/generated-default-client/*": [
+        "./generated/ms-annotation/default/client/*"
+      ],
+      "@ms-metadata/generated-default-types": [
+        "./generated/ms-metadata/default/types/src"
+      ],
+      "@ms-metadata/generated-default-types/*": [
+        "./generated/ms-metadata/default/types/src/*"
+      ],
+      "@ms-metadata/generated-default-client": [
+        "./generated/ms-metadata/default/client"
+      ],
+      "@ms-metadata/generated-default-client/*": [
+        "./generated/ms-metadata/default/client/*"
+      ],
+      "@text-service-1/generated-default-types": [
+        "./generated/text-service-1/default/types/src"
+      ],
+      "@text-service-1/generated-default-types/*": [
+        "./generated/text-service-1/default/types/src/*"
+      ],
+      "@text-service-1/generated-default-client": [
+        "./generated/text-service-1/default/client"
+      ],
+      "@text-service-1/generated-default-client/*": [
+        "./generated/text-service-1/default/client/*"
+      ],
+      "@text-service-2/generated-default-types": [
+        "./generated/text-service-2/default/types/src"
+      ],
+      "@text-service-2/generated-default-types/*": [
+        "./generated/text-service-2/default/types/src/*"
+      ],
+      "@text-service-2/generated-default-client": [
+        "./generated/text-service-2/default/client"
+      ],
+      "@text-service-2/generated-default-client/*": [
+        "./generated/text-service-2/default/client/*"
+      ]
     }
   }
 }

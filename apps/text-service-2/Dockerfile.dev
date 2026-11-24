@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1.7-labs
+FROM node:24-alpine
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
+ENV CI=true
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --parents apps/text-service-2/*/package.json generated/text-service-2/default/types/package.json ./
+
+RUN --mount=type=secret,id=npmrc,target=/app/.npmrc pnpm install
+
+CMD pnpm exec nx run ${NX_COMMAND}

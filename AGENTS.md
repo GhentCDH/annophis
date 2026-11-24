@@ -71,6 +71,17 @@ Contract, event and service-auth skills arrive together with those libs.
 | Service | Backend | Frontend |
 |---|---|---|
 | gateway | 3000 | 4200 |
+| ms-projects | 3001 | 4201 |
+| ms-corpora | 3002 | 4202 |
+| ms-annotation | 3003 | 4203 |
+| ms-metadata | 3004 | 4204 |
+| text-service-1 | 3010 | 4210 |
+| text-service-2 | 3011 | 4211 |
+| ml-adapter | 3020 | none (API only) |
+
+Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name.
+
+**Root agent files (crouton issue 16).** `.claude/skills/crouton`, `.cursor/rules/crouton.mdc` and the crouton block below are written by crouton. They name *one* project's paths. For any service, read `apps/<svc>/crouton.json` for its resources and data-sources dirs.
 
 <!-- crouton configuration start -->
 <!-- Leave the start & end comments to automatically receive updates. -->

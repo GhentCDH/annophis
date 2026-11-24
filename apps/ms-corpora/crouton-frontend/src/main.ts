@@ -1,0 +1,20 @@
+import './style.css';
+import { createApp } from 'vue';
+import { CroutonPlugin, loadRuntimeConfig } from '@ghentcdh/crouton-vue';
+import { router } from './router';
+import App from './App.vue';
+import { useApi } from './api';
+
+loadRuntimeConfig({ base: import.meta.env.BASE_URL }).then(() => {
+  const api = useApi();
+  const app = createApp(App);
+
+  app.use(
+    CroutonPlugin(api, {
+      title: 'Ms Corpora',
+      router,
+    }),
+  );
+  app.use(router);
+  app.mount('#app');
+});

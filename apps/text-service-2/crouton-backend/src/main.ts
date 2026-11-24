@@ -1,0 +1,29 @@
+import 'dotenv/config';
+import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { applyResourceTagDescriptions } from '@ghentcdh/crouton-api';
+
+import { AppModule } from './app/app.module';
+
+const bootstrap = async () => {
+  const app = await NestFactory.create(AppModule);
+  app.enableCors();
+
+  const config = new DocumentBuilder()
+    .setTitle('Text Service 2')
+    .setVersion('0.0.1')
+    .build();
+  const document = await applyResourceTagDescriptions(
+    app,
+    SwaggerModule.createDocument(app, config),
+  );
+  SwaggerModule.setup('docs', app, document);
+
+  const port = process.env.BACKEND_PORT || process.env.PORT || 3000;
+  await app.listen(port);
+  Logger.log(`Application running on http://localhost:${port}`);
+};
+
+bootstrap();

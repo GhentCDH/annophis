@@ -1,0 +1,32 @@
+{
+  "name": "text-service-1-backend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/text-service-1/crouton-backend/src",
+  "tags": [
+    "scope:backend",
+    "type:app"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/text-service-1/crouton-backend"
+      ],
+      "options": {
+        "commands": [
+          "tsup"
+        ],
+        "cwd": "apps/text-service-1/crouton-backend"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nodemon",
+        "cwd": "apps/text-service-1/crouton-backend",
+        "envFile": "apps/text-service-1/.env"
+      }
+    }
+  }
+}

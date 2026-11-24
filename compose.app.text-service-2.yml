@@ -1,0 +1,40 @@
+networks:
+  annophis-net:
+    name: annophis-net
+
+services:
+  text-service-2-frontend:
+    build:
+      context: .
+      dockerfile: apps/text-service-2/Dockerfile.dev
+    env_file: [apps/text-service-2/.env]
+    ports:
+      - "${FRONTEND_PORT:-4211}:${FRONTEND_PORT:-4211}"
+    environment:
+      - BACKEND_HOST=text-service-2-backend
+      - NX_COMMAND=text-service-2-frontend:dev
+      - WATCHPACK_POLLING=true
+      - IS_DOCKER=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.nx
+    networks: [annophis-net]
+  text-service-2-backend:
+    build:
+      context: .
+      dockerfile: apps/text-service-2/Dockerfile.dev
+    env_file: [apps/text-service-2/.env]
+    ports:
+      - "${BACKEND_PORT:-3011}:${BACKEND_PORT:-3011}"
+    # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
+    command: sh -c "pnpm exec crouton generate --yes --cwd apps/text-service-2; pnpm exec nx run text-service-2-backend:serve"
+    environment:
+      - NX_COMMAND=text-service-2-backend:serve
+      - WATCHPACK_POLLING=true
+      - IS_DOCKER=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.nx
+    networks: [annophis-net]

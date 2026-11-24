@@ -1,0 +1,88 @@
+# syntax=docker/dockerfile:1.7-labs
+# Build context: workspace root
+# ========================================================
+# Stage 1: Install dependencies
+# ========================================================
+FROM --platform=$BUILDPLATFORM node:24-alpine AS deps
+
+RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml nx.json tsconfig.base.json pnpm-workspace.yaml ./
+COPY --parents apps/ms-projects/*/package.json generated/ms-projects/default/types/package.json ./
+
+# The generated Prisma client is not a workspace package, so the committed
+# lockfile matches as-is.
+RUN --mount=type=secret,id=npmrc,target=/app/.npmrc pnpm install --frozen-lockfile
+
+# ========================================================
+# Stage 2: Build
+# ========================================================
+FROM --platform=$BUILDPLATFORM deps AS build
+
+ENV PRISMA_CLI_BINARY_TARGETS="linux-musl,linux-musl-arm64-openssl-3.0.x"
+
+COPY . .
+
+# Generate Prisma client for Linux
+RUN cd apps/ms-projects && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
+
+# Build applications
+RUN npx nx build ms-projects-backend && npx nx build ms-projects-frontend
+
+# Create flat node_modules for backend (no pnpm symlinks)
+RUN pnpm --filter @ms-projects/backend deploy --legacy --prod /app/deployed-backend
+
+# Transpile resource & data-source .ts → .js for runtime require()
+COPY apps/ms-projects/crouton-backend/src/app/resources /app/dist/apps/ms-projects/crouton-backend/resources
+COPY apps/ms-projects/crouton-backend/src/app/data-sources /app/dist/apps/ms-projects/crouton-backend/data-sources
+RUN find /app/dist/apps/ms-projects/crouton-backend/resources /app/dist/apps/ms-projects/crouton-backend/data-sources -name '*.ts' \
+    | while read f; do \
+        npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/dist/apps/ms-projects/crouton-backend/resources /app/dist/apps/ms-projects/crouton-backend/data-sources -name '*.ts' -delete
+
+# Transpile generated types .ts → .js
+RUN find /app/generated/ms-projects/default/types/src -name '*.ts' \
+    | while read f; do \
+        npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/generated/ms-projects/default/types/src -name '*.ts' -delete \
+    && sed -i 's/index\.ts/index.js/g' /app/generated/ms-projects/default/types/package.json
+
+# ========================================================
+# Stage 3: Production
+# ========================================================
+FROM node:24-alpine
+
+RUN apk add --no-cache caddy ca-certificates openssl
+
+WORKDIR /app
+
+ARG VERSION=unknown
+ARG BUILD_SHA=unknown
+ENV APP_VERSION=${VERSION}
+ENV BUILD_SHA=${BUILD_SHA}
+ENV NODE_ENV=production
+
+COPY --from=build /app/dist/apps/ms-projects/crouton-backend ./backend
+COPY --from=build /app/deployed-backend/node_modules ./node_modules
+COPY --from=build /app/generated/ms-projects/default/client ./generated/client
+# Not a workspace package (see pnpm-workspace.yaml) — place it where the
+# runtime-required data-sources resolve `@ms-projects/generated-default-client`.
+COPY --from=build /app/generated/ms-projects/default/client ./node_modules/@ms-projects/generated-default-client
+COPY --from=build /app/generated/ms-projects/default/types ./node_modules/@ms-projects/generated-default-types
+COPY --from=build /app/apps/ms-projects/crouton-frontend/dist /srv/frontend
+
+# Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
+COPY apps/ms-projects/crouton.json apps/ms-projects/crouton.enums.json ./
+
+COPY apps/ms-projects/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
+COPY apps/ms-projects/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 9000 3000
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+

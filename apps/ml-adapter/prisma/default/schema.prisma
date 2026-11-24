@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../generated/ml-adapter/default/client"
+}
+
+generator crouton {
+  provider = "crouton-prisma"
+  output   = "../../../../generated/ml-adapter/default/types/src"
+}
+
+datasource db {
+  provider = "postgresql"
+  // url is provided by prisma/default/prisma.config.ts (Prisma 7 forbids `url` here)
+}

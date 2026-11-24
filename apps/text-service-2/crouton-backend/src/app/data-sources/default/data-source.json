@@ -1,0 +1,11 @@
+{
+  "type": "postgres",
+  "name": "default",
+  "default": true,
+  "prismaSchema": "prisma/default/schema.prisma",
+  "urlEnv": "DATABASE_URL",
+  "generatedTypesImport": "@text-service-2/generated-default-types",
+  "zodOutput": "../../generated/text-service-2/default/types/src",
+  "clientOutput": "../../generated/text-service-2/default/client",
+  "prismaConfig": "prisma/default/prisma.config.ts"
+}
