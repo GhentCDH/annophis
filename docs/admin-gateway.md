@@ -81,6 +81,19 @@ sequenceDiagram
 
 A service that is down is skipped, with a warning in the gateway log.
 
+Service URLs come from `ANNOPHIS_<SVC>_URL` (e.g. `ANNOPHIS_MS_PROJECTS_URL`), falling back to `http://localhost:<port>` for `pnpm dev`.
+
+## Health of the whole stack
+
+`GET /api/health/services` (public) calls the gateway and every service's `/health`. It returns `{ status: 'ok' | 'degraded', services: [...] }`: HTTP 200 when everything is up and on the bus, 503 otherwise. Compose and Nomad use it as the gateway's health check.
+
+In the UI: **http://localhost:6200/system-status** shows the same data as a table that refreshes every 10 s. It requires a login, like the rest of the admin. The raw JSON is at `/api/health/services`. Each row shows:
+- status and event-bus connection (`/health`);
+- the crouton self-check summary (`/crouton/status.json`: database and resource errors), which also counts towards the overall status. Below the table, a collapsible block per service shows the main parts of crouton's status: app and crouton version, environment, databases, and resources (valid / invalid / warnings / draft / needs migration), problems first. Services with problems open automatically;
+- links to the service's **API docs** (Swagger at `/api/<svc>/docs`, the gateway's at `/api/docs`) and its crouton status JSON.
+
+Every service's OpenAPI document lists two servers: `/api/<svc>` (through the gateway) and `/` (the service directly). Swagger's "Try it out" therefore works from the admin UI.
+
 ## Opening and editing a resource
 
 ```mermaid

@@ -8,6 +8,7 @@ import { applyResourceTagDescriptions } from '@ghentcdh/crouton-api';
 
 import { mountAdminFacade } from './admin-facade';
 import { AppModule } from './app/app.module';
+import { mountServiceHealth } from './service-health';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
@@ -27,10 +28,13 @@ const bootstrap = async () => {
   const port = process.env.BACKEND_PORT || process.env.PORT || 3000;
   // One admin UI for all services: merged /_app/layout + /<svc>/* proxy (before Nest's router).
   mountAdminFacade(app, port);
+  mountServiceHealth(app, port);
 
   const config = new DocumentBuilder()
     .setTitle('Annophis')
     .setVersion('0.0.1')
+    .addServer('/api', 'via the admin UI')
+    .addServer('/', 'the gateway directly')
     .build();
   const document = await applyResourceTagDescriptions(
     app,

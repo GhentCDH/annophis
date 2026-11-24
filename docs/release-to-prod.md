@@ -61,7 +61,7 @@ flowchart TB
 | NATS container | `nats` task in the group, with JetStream storage on a CSI volume (see `volumes/` in the nomad-jobs repo). JetStream prefers local disk, so check NFS performance or use a host volume. |
 | Vite proxy `/api` → gateway backend | nginx sidecar `/api` → gateway backend, as in `new_polities`. The gateway image's Caddy only serves the UI. |
 | `.env.example` defaults | Vault `kv_nomad/ghentcdh/annophis`, rendered into each task's env with a `template` block |
-| service URLs `localhost:61xx` / `<svc>-backend` | services on their own ports inside the group. The gateway reads service URLs from env (**TODO (phase 1)**, see below). |
+| service URLs from `ANNOPHIS_<SVC>_URL` (compose: `http://<svc>-backend:<port>`) | the same env vars, e.g. `ANNOPHIS_MS_PROJECTS_URL=http://{{ env "NOMAD_ADDR_ms_projects" }}` |
 | backends run `prisma migrate deploy` on start (compose command) | `migrate` **prestart** task before the services start (**TODO (phase 1)**). The prod images don't migrate. |
 
 ### Sketch of the job template
@@ -127,15 +127,15 @@ Every task gets its env from Vault (`kv_nomad/ghentcdh/annophis`):
 
 - The **admin UI is the gateway**, and the admin writes straight to the databases. It is protected by the Keycloak `admin` role. For `prd`, also decide whether to restrict the vhost to the UGent network or VPN, as other internal GhentCDH tools do.
 - Services, NATS and the migrate task have no load-balancer service, so they're only reachable inside the group.
-- Health: the nginx service check calls `/` (the UI). **TODO (phase 1):** add a gateway endpoint that reports every service's `/health`, and use it as the Nomad check.
+- Health: the Nomad service check calls the gateway's `GET /api/health/services`. It returns 200 only when the gateway and every service are up and connected to NATS, and 503 otherwise.
 
 ## TODO before the first deploy (phase 1)
 
-1. The gateway reads service URLs from env (`ANNOPHIS_<SVC>_URL`) instead of the `IS_DOCKER`/`localhost` switch in `apps/gateway/crouton-backend/src/services.ts`.
+1. ~~The gateway reads service URLs from env~~: done (`ANNOPHIS_<SVC>_URL`).
 2. A migrate step for production (prestart task or entrypoint flag), since the prod images don't run `prisma migrate deploy`.
 3. Confirm Nexus ↔ ghcr image pulls with the infra team.
 4. Create the `annophis` folder in the nomad-jobs repo (`job.nomad.hcl.j2` plus `tst`/`qas`/`prd` vars) and the Vault secrets.
 5. Create the DB `annophis` (users, schemas, `GRANT CREATE ON DATABASE`) on the central Postgres, and the realm `annophis` on `auth.ghentcdh.ugent.be`.
 6. NATS JetStream storage: a CSI volume or host volume, plus a retention policy for stream `ANNOPHIS`.
-7. An aggregated health endpoint for the Nomad check, and a smoke test (the e2e suite against `tst`).
+7. ~~Aggregated health endpoint~~: done (`/health/services`). Still to do: a smoke test, i.e. the e2e suite against `tst`.
 8. Register the application, domains and healthchecks in auto (`auto:audit` skill, or the `auto` MCP server in `.mcp.json`).

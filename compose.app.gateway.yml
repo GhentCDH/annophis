@@ -36,11 +36,25 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
       nats: { condition: service_healthy }
+    healthcheck:
+      # healthy = gateway + every service up and on the bus (GET /health/services)
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${BACKEND_PORT:-6100}/health/services >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
     environment:
       - NX_COMMAND=gateway-backend:serve
       # .env points at localhost for `pnpm dev`; inside the network use service hostnames
       - DATABASE_URL=postgresql://gateway:dev@postgres:5432/annophis?schema=gateway
       - NATS_URL=nats://nats:4222
+      # service backends for the admin facade and /health/services
+      - ANNOPHIS_MS_PROJECTS_URL=http://ms-projects-backend:6101
+      - ANNOPHIS_MS_CORPORA_URL=http://ms-corpora-backend:6102
+      - ANNOPHIS_MS_ANNOTATION_URL=http://ms-annotation-backend:6103
+      - ANNOPHIS_MS_METADATA_URL=http://ms-metadata-backend:6104
+      - ANNOPHIS_TEXT_SERVICE_1_URL=http://text-service-1-backend:6110
+      - ANNOPHIS_TEXT_SERVICE_2_URL=http://text-service-2-backend:6111
+      - ANNOPHIS_ML_ADAPTER_URL=http://ml-adapter-backend:6120
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:

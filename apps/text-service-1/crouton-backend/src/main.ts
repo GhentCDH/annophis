@@ -14,6 +14,9 @@ const bootstrap = async () => {
   const config = new DocumentBuilder()
     .setTitle('Text Service 1')
     .setVersion('0.0.1')
+    // Swagger 'Try it out': through the gateway (one origin, admin login) or straight at this service
+    .addServer('/api/text-service-1', 'via the gateway')
+    .addServer('/', 'this service directly')
     .build();
   const document = await applyResourceTagDescriptions(
     app,
