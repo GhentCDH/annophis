@@ -2,6 +2,8 @@
 
 Entry point for every coding agent (Claude, Codex, Copilot, Cursor). `CLAUDE.md` only imports this file.
 
+Architecture diagrams (Mermaid): [docs/](docs/README.md): overview, admin gateway, events, auth.
+
 ## Layout
 
 ```
@@ -14,6 +16,7 @@ apps/<svc>/                one crouton project per service
 libs/<lib>/                shared TypeScript, imported as @annophis/<lib>
 generated/<svc>/default/   Prisma client + Zod types. NEVER edit by hand.
 docker/                    infra init files (postgres, keycloak)
+docs/                      architecture docs + Mermaid diagrams
 compose.yml                `docker compose up` starts everything
 ```
 
@@ -67,6 +70,14 @@ pnpm nx run <svc>-backend:serve
 docker compose up
 pnpm nx e2e e2e      # Playwright, against the running stack
 ```
+
+## MCP servers (`.mcp.json`)
+
+| Server | What for | Needs |
+|---|---|---|
+| `nx-mcp` | workspace graph, projects, targets, generators | nothing (runs via `npx`) |
+| `prisma` | migrations and schema of a service's database | `pnpm install` |
+| `auto` | GhentCDH IT inventory: where Annophis runs, domains, healthchecks, Nomad/Caddy deploy config | the `auto` binary (`curl -fsSL https://raw.githubusercontent.com/GhentCDH/auto/main/scripts/install.sh \| sh`), then `auto login --url <server>` and `auto token create "claude" --save` |
 
 ## Skills (`.claude/skills/`)
 
