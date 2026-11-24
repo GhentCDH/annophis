@@ -39,7 +39,7 @@ docker compose up            # Postgres, NATS, Keycloak and every service (dev m
 
 To run infra in Docker and the apps on the host: `docker compose up postgres nats keycloak`, then `pnpm dev`.
 
-Postgres and Keycloak read their init files only on an empty volume. To reset: `docker compose down && rm -rf var`.
+Postgres reads its init files only on an empty volume. To reset: `docker compose down && rm -rf var`. Keycloak keeps no data: it re-imports `docker/keycloak/annophis-realm.json` on every start, so export console changes (below) or they are lost.
 
 ### Changing the Keycloak realm
 

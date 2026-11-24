@@ -44,8 +44,9 @@ services:
       KC_HEALTH_ENABLED: "true"
     ports: ["8080:8080"]
     volumes:
+      # No data volume: the realm is imported from the committed JSON on every start (a root-owned bind
+      # mount is not writable for the keycloak user on Linux). Export console changes to the JSON (README).
       - ./docker/keycloak:/opt/keycloak/data/import:ro
-      - ./var/keycloak:/opt/keycloak/data/h2
     healthcheck:
       # the image has no curl/wget; probe the management port with bash
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
