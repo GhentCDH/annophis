@@ -87,6 +87,8 @@ Service URLs come from `ANNOPHIS_<SVC>_URL` (e.g. `ANNOPHIS_MS_PROJECTS_URL`), f
 
 `GET /api/health/services` (public) calls the gateway and every service's `/health`. It returns `{ status: 'ok' | 'degraded', services: [...] }`: HTTP 200 when everything is up and on the bus, 503 otherwise. Compose and Nomad use it as the gateway's health check.
 
+In the UI: **http://localhost:6200/system-status** shows the same data as a table that refreshes every 10 s. It requires a login, like the rest of the admin. The raw JSON is at `/api/health/services`.
+
 ## Opening and editing a resource
 
 ```mermaid
