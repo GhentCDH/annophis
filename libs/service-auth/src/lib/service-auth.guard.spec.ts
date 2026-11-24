@@ -4,14 +4,16 @@ import type { Reflector } from '@nestjs/core';
 import { SignJWT } from 'jose';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { INTERNAL_JWT_ISSUER, ServiceAuthGuard } from './service-auth.guard';
+import { INTERNAL_JWT_ISSUER, signInternalToken } from './internal-token';
+import { ServiceAuthGuard } from './service-auth.guard';
 
 const SECRET = 'test-secret';
 const sign = (claims: { iss?: string; aud?: string; exp?: string } = {}, secret = SECRET) =>
-  new SignJWT({ userId: 'u1' })
+  new SignJWT({ roles: ['admin'] })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuer(claims.iss ?? INTERNAL_JWT_ISSUER)
     .setAudience(claims.aud ?? 'ms-projects')
+    .setSubject('u1')
     .setExpirationTime(claims.exp ?? '5m')
     .sign(new TextEncoder().encode(secret));
 
@@ -53,20 +55,33 @@ describe('ServiceAuthGuard', () => {
     expect(req.caller).toEqual({ type: 'service' });
   });
 
-  it('accepts a gateway JWT for this service as a user caller', async () => {
-    const { ctx, req } = ctxFor({ authorization: `Bearer ${await sign()}` });
+  it('accepts a gateway token for this service as a user caller', async () => {
+    const { ctx, req } = ctxFor({ 'x-internal-token': await sign() });
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
-    expect(req.caller).toMatchObject({ type: 'user', userId: 'u1' });
+    expect(req.caller).toMatchObject({ type: 'user', userId: 'u1', roles: ['admin'] });
+  });
+
+  it('accepts a token from signInternalToken (the gateway signer)', async () => {
+    const token = await signInternalToken({ id: 'u2', email: 'a@b.c', roles: ['viewer'] }, 'ms-projects', SECRET);
+    const { ctx, req } = ctxFor({ 'x-internal-token': token });
+    await expect(guard.canActivate(ctx)).resolves.toBe(true);
+    expect(req.caller).toMatchObject({ type: 'user', userId: 'u2', email: 'a@b.c', roles: ['viewer'] });
+  });
+
+  it('ignores a token sent as Authorization (that header carries the crouton session)', async () => {
+    await expect(guard.canActivate(ctxFor({ authorization: `Bearer ${await sign()}` }).ctx)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 
   it.each([
     ['no credentials', async () => ({})],
     ['unknown API key', async () => ({ 'x-api-key': 'nope' })],
-    ['JWT for another service', async () => ({ authorization: `Bearer ${await sign({ aud: 'ms-corpora' })}` })],
-    ['JWT from another issuer', async () => ({ authorization: `Bearer ${await sign({ iss: 'someone' })}` })],
-    ['JWT with wrong secret', async () => ({ authorization: `Bearer ${await sign({}, 'other')}` })],
-    ['expired JWT', async () => ({ authorization: `Bearer ${await sign({ exp: '-1s' })}` })],
-    ['garbage token', async () => ({ authorization: 'Bearer abc' })],
+    ['token for another service', async () => ({ 'x-internal-token': await sign({ aud: 'ms-corpora' }) })],
+    ['token from another issuer', async () => ({ 'x-internal-token': await sign({ iss: 'someone' }) })],
+    ['token with wrong secret', async () => ({ 'x-internal-token': await sign({}, 'other') })],
+    ['expired token', async () => ({ 'x-internal-token': await sign({ exp: '-1s' }) })],
+    ['garbage token', async () => ({ 'x-internal-token': 'abc' })],
   ])('rejects %s with 401', async (_, headers) => {
     await expect(guard.canActivate(ctxFor(await headers()).ctx)).rejects.toBeInstanceOf(UnauthorizedException);
   });

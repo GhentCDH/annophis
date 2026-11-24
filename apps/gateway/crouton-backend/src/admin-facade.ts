@@ -3,6 +3,7 @@ import type { INestApplication } from '@nestjs/common';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
+import { attachInternalToken } from './internal-token.middleware';
 import { mergeLayouts } from './merge-layouts';
 import type { Layout } from './merge-layouts';
 import { adminServices, serviceUrl } from './services';
@@ -15,8 +16,9 @@ type Next = (err?: unknown) => void;
 /**
  * Presents every service as one crouton backend, so the gateway's single admin UI covers them all:
  * - GET /_app/layout: the gateway's own sidebar plus one group per service (admins only);
- * - /<svc>/*: reverse proxy to that service (prefix stripped), Authorization forwarded, so each service still
- *   enforces its own `admin` guard with the shared crouton session token.
+ * - /<svc>/*: reverse proxy to that service (prefix stripped). Authorization (crouton session) is forwarded, so each
+ *   service still enforces its own `admin` guard on crouton routes, and an internal token (X-Internal-Token) for
+ *   that service is attached for its ServiceAuthGuard-protected domain routes.
  * Express middleware registered before Nest's router, so it takes /_app/layout over from crouton.
  */
 export const mountAdminFacade = (app: INestApplication, port: number | string) => {
@@ -55,7 +57,8 @@ export const mountAdminFacade = (app: INestApplication, port: number | string) =
   });
 
   for (const s of adminServices) {
-    // mounted at /<svc>: express strips the prefix, the service serves its routes unprefixed
-    app.use(`/${s.name}`, createProxyMiddleware({ target: serviceUrl(s), changeOrigin: true }));
+    // mounted at /<svc>: express strips the prefix, the service serves its routes unprefixed.
+    // The user's crouton session is turned into an internal token for that service (X-Internal-Token).
+    app.use(`/${s.name}`, attachInternalToken(s.name), createProxyMiddleware({ target: serviceUrl(s), changeOrigin: true }));
   }
 };

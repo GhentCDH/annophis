@@ -3,19 +3,20 @@ import type { CanActivate, CustomDecorator, ExecutionContext } from '@nestjs/com
 import { Reflector } from '@nestjs/core';
 import { jwtVerify } from 'jose';
 
+import { INTERNAL_JWT_ISSUER, INTERNAL_TOKEN_HEADER } from './internal-token';
+
 const PUBLIC = 'annophis:public';
 /** Marks a route as reachable without service auth (e.g. /health). */
 export const Public = (): CustomDecorator<string> => SetMetadata(PUBLIC, true);
 
-export const INTERNAL_JWT_ISSUER = 'annophis-gateway';
 
 export type Caller =
   | { type: 'service' }
-  | { type: 'user'; userId?: string; projectId?: string; projectRole?: string; [claim: string]: unknown };
+  | { type: 'user'; userId: string; email?: string; roles: string[]; [claim: string]: unknown };
 
 /**
- * Accepts either an `X-Api-Key` from SERVICE_API_KEYS (service → service) or an internal
- * HS256 JWT issued by the gateway (iss `annophis-gateway`, aud = SERVICE_NAME).
+ * Accepts either an `X-Api-Key` from SERVICE_API_KEYS (service → service) or the internal HS256 JWT the
+ * gateway attaches in `X-Internal-Token` (iss `annophis-gateway`, aud = SERVICE_NAME, sub = user id).
  * SERVICE_AUTH=off disables the check (local dev only).
  */
 @Injectable()
@@ -35,16 +36,21 @@ export class ServiceAuthGuard implements CanActivate {
       return true;
     }
 
-    const token = req.headers.authorization?.replace(/^Bearer /, '');
+    const token = req.headers[INTERNAL_TOKEN_HEADER];
     const secret = process.env['INTERNAL_JWT_SECRET'];
-    if (!token || !secret) throw new UnauthorizedException();
+    if (typeof token !== 'string' || !secret) throw new UnauthorizedException();
     try {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), {
         issuer: INTERNAL_JWT_ISSUER,
         audience: process.env['SERVICE_NAME'],
         algorithms: ['HS256'],
       });
-      req.caller = { type: 'user', ...payload } satisfies Caller;
+      req.caller = {
+        ...payload,
+        type: 'user',
+        userId: String(payload.sub),
+        roles: Array.isArray(payload['roles']) ? (payload['roles'] as string[]) : [],
+      } satisfies Caller;
       return true;
     } catch {
       throw new UnauthorizedException();
