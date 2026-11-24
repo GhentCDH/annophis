@@ -5,7 +5,7 @@ import { EntityChangedEvent } from '@annophis/contracts';
 
 import { authFile, sessionToken } from './users';
 
-const NATS_URL = process.env['NATS_URL'] ?? 'nats://localhost:4222';
+const NATS_URL = process.env['NATS_URL'] ?? 'nats://localhost:6422';
 
 test.use({ storageState: authFile('admin') });
 
