@@ -42,7 +42,7 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
    pnpm exec crouton update resources --project apps/<svc> --yes --skip-pull
    ```
 7. Infra:
-   - Add `CREATE USER <svc_u> WITH PASSWORD 'dev' CREATEDB; CREATE SCHEMA <svc_u> AUTHORIZATION <svc_u>;` to `docker/init-data/01-schemas.sql`. It runs on an empty volume only, so reset with `docker compose down && rm -rf var/pgdata`.
+   - Add `CREATE USER <svc_u> WITH PASSWORD 'dev' CREATEDB; CREATE SCHEMA <svc_u> AUTHORIZATION <svc_u>; GRANT CREATE ON DATABASE annophis TO <svc_u>;` to `docker/init-data/01-schemas.sql`. It runs on an empty volume only, so reset with `docker compose down && rm -rf var/pgdata`.
    - Fix `DATABASE_URL` in `.env.example`: crouton writes its default there, not `--db-url` (crouton bug, not yet reported upstream).
    - In `compose.app.<svc>.yml`, give the backend `DATABASE_URL=postgresql://<svc_u>:dev@postgres:5432/annophis?schema=<svc_u>` and `NATS_URL=nats://nats:4222` under `environment`, plus `depends_on` on `postgres` and `nats` with `condition: service_healthy`. Copy the block from an existing service.
 8. Add the service to the Ports table in `AGENTS.md`. CI and `compose.yml` pick it up automatically: CI loops over `apps/*/crouton.json`, and crouton adds the compose include.
