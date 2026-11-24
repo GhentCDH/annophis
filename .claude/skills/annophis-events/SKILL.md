@@ -15,6 +15,10 @@ The `EventBus` (`@annophis/events`) is provided by `AnnophisServiceModule`. Inje
   - It creates one durable consumer per service and filter.
   - **Handlers must be idempotent.** A throw means NAK and redelivery. Dedupe on `event.id` when the side effect is not idempotent.
   - Validate input with the contract schema: `X.parse(event)`.
-- **Admin/CRUD writes:** never publish from controllers. The Prisma client extension in `libs/events` emits entity events, so admin writes produce them too.
+- **Entity events:** every data source wraps its client with `withEntityEvents(new PrismaClient({ adapter }), '<svc>')` in `data-sources/default/index.ts`.
+  - Every write publishes `<svc>.<model>.<created|updated|deleted>`, with data = the row and subject = its id. Bulk writes without returned rows publish `{ count, where }`.
+  - The contract is `EntityChangedEvent` in `@annophis/contracts`.
+  - Admin CRUD goes through the same client, so it emits too. **Never publish entity events from controllers.**
+  - Fire-and-forget after the query returns: a NATS outage logs and drops the event and never fails the write. Inside an interactive transaction, an event can precede the commit. A transactional outbox is the upgrade path when that matters.
 - **Stream:** one JetStream stream `ANNOPHIS` on `annophis.>`. Inspect with `docker run --rm -it --network annophis-net natsio/nats-box nats sub -s nats://nats:4222 'annophis.>'`, or watch the `http://localhost:6482` monitoring page.
 - **Tests:** use `createEventBusMock()` from `@annophis/testing`. It records `publish` calls without NATS.

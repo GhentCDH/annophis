@@ -6,6 +6,8 @@ import { connect } from '@nats-io/transport-node';
 import type { NatsConnection } from '@nats-io/transport-node';
 import { randomUUID } from 'node:crypto';
 
+import { setEntityEventPublisher } from './entity-events.extension';
+
 export const EVENTS_OPTIONS = Symbol('EVENTS_OPTIONS');
 export type EventsOptions = { service: string; servers?: string };
 
@@ -38,6 +40,7 @@ export class EventBus implements OnModuleInit, OnModuleDestroy {
       .info(STREAM)
       .catch(() => this.jsm.streams.add({ name: STREAM, subjects: ['annophis.>'] }));
     this.js = jetstream(this.nc);
+    setEntityEventPublisher(this);
   }
 
   isConnected = () => !!this.nc && !this.nc.isClosed();
@@ -84,6 +87,7 @@ export class EventBus implements OnModuleInit, OnModuleDestroy {
   };
 
   async onModuleDestroy() {
+    setEntityEventPublisher(undefined);
     await this.nc?.drain();
   }
 }

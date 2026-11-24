@@ -88,7 +88,7 @@ Plain markdown; any agent can read them.
 |---|---|---|
 | `@annophis/domain-types` | shared | Zod primitives: `TextUrn`, `TextSelector` (NFC code points), W3C `Annotation` |
 | `@annophis/contracts` | shared | REST DTOs and event schemas per service; the single source of truth |
-| `@annophis/events` | backend | `EventBus` (NATS JetStream), and later the Prisma extension that emits entity events |
+| `@annophis/events` | backend | `EventBus` (NATS JetStream) and `withEntityEvents()`, the Prisma extension that emits `<svc>.<model>.<verb>` on every write |
 | `@annophis/service-auth` | backend | `ServiceAuthGuard`, `@Public()` |
 | `@annophis/service-kit` | backend | `AnnophisServiceModule.forRoot(...)`: EventBus, `/health`, `/hello`, global guard |
 | `@annophis/testing` | backend | `createEventBusMock()` and other test helpers |

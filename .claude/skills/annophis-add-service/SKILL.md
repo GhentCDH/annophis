@@ -33,18 +33,19 @@ description: Add a new Annophis service (crouton project) under apps/. Use when 
    - `crouton-backend/tsconfig.json`: remove `rootDir`.
    - `crouton-backend/tsup.config.ts`: `noExternal: [/@<svc>\/.*/, /@annophis\/.*/]`.
    - `crouton-backend/nodemon.json`: add `"../../../libs"` to `watch`.
-5. Tags:
+5. Wrap the Prisma client in `crouton-backend/src/app/data-sources/default/index.ts`: `const client = withEntityEvents(new PrismaClient({ adapter }), '<svc>');` (from `@annophis/events`). Add `AnnophisServiceModule.forRoot()` after `ConfigModule` in `app.module.ts`, add the keycloak auth provider (copy from another service and set `authProvidersDir` in `crouton.json`), and add the admin env vars from another service's `.env.example`.
+6. Tags:
    - Backend `project.json`: `["scope:backend", "type:app"]`.
    - `generated/<svc>/default/types/package.json`: `"nx": { "tags": ["scope:shared", "type:generated"] }`.
-6. Generate without a DB, then revert the agent files again (step 2):
+7. Generate without a DB, then revert the agent files again (step 2):
    ```sh
    pnpm exec crouton update resources --project apps/<svc> --yes --skip-pull
    ```
-7. Infra:
+8. Infra:
    - Add `CREATE USER <svc_u> WITH PASSWORD 'dev' CREATEDB; CREATE SCHEMA <svc_u> AUTHORIZATION <svc_u>; GRANT CREATE ON DATABASE annophis TO <svc_u>;` to `docker/init-data/01-schemas.sql`. It runs on an empty volume only, so reset with `docker compose down && rm -rf var/pgdata`.
    - Fix `DATABASE_URL` in `.env.example`: crouton writes its default there, not `--db-url` (crouton bug, not yet reported upstream).
    - In `compose.app.<svc>.yml`, give the backend `DATABASE_URL=postgresql://<svc_u>:dev@postgres:5432/annophis?schema=<svc_u>` and `NATS_URL=nats://nats:4222` under `environment`, plus `depends_on` on `postgres` and `nats` with `condition: service_healthy`. Copy the block from an existing service.
-8. Admin UI: set `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir` (`crouton-backend/src/app/app.module.ts`) and add `{ name, title, port }` to `apps/gateway/crouton-backend/src/services.ts`. Then add the service to the Ports table in `AGENTS.md`. CI and `compose.yml` pick it up automatically: CI loops over `apps/*/crouton.json`, and crouton adds the compose include.
-9. Verify: `pnpm nx run-many -t lint typecheck build`, then `docker compose up`.
+9. Admin UI: set `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir` (`crouton-backend/src/app/app.module.ts`) and add `{ name, title, port }` to `apps/gateway/crouton-backend/src/services.ts` and the service to `apps/e2e/src/services.ts`. Then add the service to the Ports table in `AGENTS.md`. CI and `compose.yml` pick it up automatically: CI loops over `apps/*/crouton.json`, and crouton adds the compose include.
+10. Verify: `pnpm nx run-many -t lint typecheck build`, then `docker compose up`.
 
 Never edit `generated/<svc>/` by hand.
