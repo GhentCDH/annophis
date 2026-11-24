@@ -2,6 +2,8 @@
 
 Entry point for every coding agent (Claude, Codex, Copilot, Cursor). `CLAUDE.md` only imports this file.
 
+Architecture diagrams (Mermaid): [docs/](docs/README.md): overview, admin gateway, events, auth.
+
 ## Layout
 
 ```
@@ -14,6 +16,7 @@ apps/<svc>/                one crouton project per service
 libs/<lib>/                shared TypeScript, imported as @annophis/<lib>
 generated/<svc>/default/   Prisma client + Zod types. NEVER edit by hand.
 docker/                    infra init files (postgres, keycloak)
+docs/                      architecture docs + Mermaid diagrams
 compose.yml                `docker compose up` starts everything
 ```
 

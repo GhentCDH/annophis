@@ -74,4 +74,6 @@ docker compose start keycloak
 | `docker-build.yml` | tag `v*` | one image per service to `ghcr.io/<owner>/annophis-<svc>`, then a GitHub release from Conventional Commits |
 | `labeler.yml`, `pr-title.yml` | PRs | labels from branch/files/title; title must be a Conventional Commit |
 
+Architecture, with diagrams of the gateway, events and auth: [docs/](docs/README.md).
+
 The development guide for coding agents is [AGENTS.md](AGENTS.md).
