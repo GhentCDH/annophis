@@ -6,6 +6,7 @@
     "prisma:migrate": "npx prisma migrate dev --config prisma/default/prisma.config.ts"
   },
   "dependencies": {
+    "@gateway/generated-default-types": "workspace:*",
     "@ghentcdh/crouton-api": "0.2.0-rc.4",
     "@nestjs/common": "^12.4.0",
     "@nestjs/config": "^12.1.1",
@@ -16,14 +17,15 @@
     "@prisma/client": "^7.0.0",
     "@prisma/client-runtime-utils": "^7.0.0",
     "dotenv": "^18.0.10",
+    "express-session": "^1.19.0",
     "pg": "^8.23.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.0.0",
     "tslib": "^2.9.1",
-    "zod": "^4.0.0",
-    "@gateway/generated-default-types": "workspace:*"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@types/express-session": "^1.19.0",
     "@types/node": "^26.6.6",
     "prisma": "^7.0.0",
     "typescript": "~5.9.0",
