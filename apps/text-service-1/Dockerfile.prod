@@ -1,0 +1,88 @@
+# syntax=docker/dockerfile:1.7-labs
+# Build context: workspace root
+# ========================================================
+# Stage 1: Install dependencies
+# ========================================================
+FROM --platform=$BUILDPLATFORM node:24-alpine AS deps
+
+RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml nx.json tsconfig.base.json pnpm-workspace.yaml ./
+COPY --parents apps/text-service-1/*/package.json generated/text-service-1/default/types/package.json ./
+
+# The generated Prisma client is not a workspace package, so the committed
+# lockfile matches as-is.
+RUN --mount=type=secret,id=npmrc,target=/app/.npmrc pnpm install --frozen-lockfile
+
+# ========================================================
+# Stage 2: Build
+# ========================================================
+FROM --platform=$BUILDPLATFORM deps AS build
+
+ENV PRISMA_CLI_BINARY_TARGETS="linux-musl,linux-musl-arm64-openssl-3.0.x"
+
+COPY . .
+
+# Generate Prisma client for Linux
+RUN cd apps/text-service-1 && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
+
+# Build applications
+RUN npx nx build text-service-1-backend && npx nx build text-service-1-frontend
+
+# Create flat node_modules for backend (no pnpm symlinks)
+RUN pnpm --filter @text-service-1/backend deploy --legacy --prod /app/deployed-backend
+
+# Transpile resource & data-source .ts → .js for runtime require()
+COPY apps/text-service-1/crouton-backend/src/app/resources /app/dist/apps/text-service-1/crouton-backend/resources
+COPY apps/text-service-1/crouton-backend/src/app/data-sources /app/dist/apps/text-service-1/crouton-backend/data-sources
+RUN find /app/dist/apps/text-service-1/crouton-backend/resources /app/dist/apps/text-service-1/crouton-backend/data-sources -name '*.ts' \
+    | while read f; do \
+        npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/dist/apps/text-service-1/crouton-backend/resources /app/dist/apps/text-service-1/crouton-backend/data-sources -name '*.ts' -delete
+
+# Transpile generated types .ts → .js
+RUN find /app/generated/text-service-1/default/types/src -name '*.ts' \
+    | while read f; do \
+        npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
+      done \
+    && find /app/generated/text-service-1/default/types/src -name '*.ts' -delete \
+    && sed -i 's/index\.ts/index.js/g' /app/generated/text-service-1/default/types/package.json
+
+# ========================================================
+# Stage 3: Production
+# ========================================================
+FROM node:24-alpine
+
+RUN apk add --no-cache caddy ca-certificates openssl
+
+WORKDIR /app
+
+ARG VERSION=unknown
+ARG BUILD_SHA=unknown
+ENV APP_VERSION=${VERSION}
+ENV BUILD_SHA=${BUILD_SHA}
+ENV NODE_ENV=production
+
+COPY --from=build /app/dist/apps/text-service-1/crouton-backend ./backend
+COPY --from=build /app/deployed-backend/node_modules ./node_modules
+COPY --from=build /app/generated/text-service-1/default/client ./generated/client
+# Not a workspace package (see pnpm-workspace.yaml) — place it where the
+# runtime-required data-sources resolve `@text-service-1/generated-default-client`.
+COPY --from=build /app/generated/text-service-1/default/client ./node_modules/@text-service-1/generated-default-client
+COPY --from=build /app/generated/text-service-1/default/types ./node_modules/@text-service-1/generated-default-types
+COPY --from=build /app/apps/text-service-1/crouton-frontend/dist /srv/frontend
+
+# Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
+COPY apps/text-service-1/crouton.json apps/text-service-1/crouton.enums.json ./
+
+COPY apps/text-service-1/crouton-frontend/Caddyfile /etc/caddy/Caddyfile
+COPY apps/text-service-1/crouton-frontend/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 9000 3000
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["sh", "-c", "node /app/backend/main.js & caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+

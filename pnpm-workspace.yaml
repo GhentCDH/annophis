@@ -1,4 +1,25 @@
 packages:
+  - apps/text-service-2/*
+  - generated/text-service-2/**
+  - '!generated/text-service-2/*/client'
+  - apps/text-service-1/*
+  - generated/text-service-1/**
+  - '!generated/text-service-1/*/client'
+  - apps/ms-metadata/*
+  - generated/ms-metadata/**
+  - '!generated/ms-metadata/*/client'
+  - apps/ms-annotation/*
+  - generated/ms-annotation/**
+  - '!generated/ms-annotation/*/client'
+  - apps/ms-corpora/*
+  - generated/ms-corpora/**
+  - '!generated/ms-corpora/*/client'
+  - apps/ms-projects/*
+  - generated/ms-projects/**
+  - '!generated/ms-projects/*/client'
+  - apps/ml-adapter/*
+  - generated/ml-adapter/**
+  - '!generated/ml-adapter/*/client'
   - apps/gateway/*
   - generated/gateway/**
   - '!generated/gateway/*/client'

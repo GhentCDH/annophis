@@ -1,0 +1,32 @@
+{
+  "name": "ml-adapter-backend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/ml-adapter/crouton-backend/src",
+  "tags": [
+    "scope:backend",
+    "type:app"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/ml-adapter/crouton-backend"
+      ],
+      "options": {
+        "commands": [
+          "tsup"
+        ],
+        "cwd": "apps/ml-adapter/crouton-backend"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nodemon",
+        "cwd": "apps/ml-adapter/crouton-backend",
+        "envFile": "apps/ml-adapter/.env"
+      }
+    }
+  }
+}

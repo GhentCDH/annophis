@@ -1,0 +1,18 @@
+{
+  "name": "text-service-1-frontend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/text-service-1/crouton-frontend/src",
+  "tags": [
+    "scope:frontend",
+    "type:app"
+  ],
+  "targets": {
+    "typecheck": {
+      "command": "vue-tsc --noEmit",
+      "options": {
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

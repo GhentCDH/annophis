@@ -1,2 +1,9 @@
 include:
   - compose.app.gateway.yml
+  - compose.app.ml-adapter.yml
+  - compose.app.ms-projects.yml
+  - compose.app.ms-corpora.yml
+  - compose.app.ms-annotation.yml
+  - compose.app.ms-metadata.yml
+  - compose.app.text-service-1.yml
+  - compose.app.text-service-2.yml

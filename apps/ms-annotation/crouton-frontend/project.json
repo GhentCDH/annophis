@@ -1,0 +1,18 @@
+{
+  "name": "ms-annotation-frontend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/ms-annotation/crouton-frontend/src",
+  "tags": [
+    "scope:frontend",
+    "type:app"
+  ],
+  "targets": {
+    "typecheck": {
+      "command": "vue-tsc --noEmit",
+      "options": {
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

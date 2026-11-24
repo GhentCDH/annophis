@@ -1,0 +1,32 @@
+{
+  "name": "ms-annotation-backend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/ms-annotation/crouton-backend/src",
+  "tags": [
+    "scope:backend",
+    "type:app"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/ms-annotation/crouton-backend"
+      ],
+      "options": {
+        "commands": [
+          "tsup"
+        ],
+        "cwd": "apps/ms-annotation/crouton-backend"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nodemon",
+        "cwd": "apps/ms-annotation/crouton-backend",
+        "envFile": "apps/ms-annotation/.env"
+      }
+    }
+  }
+}
