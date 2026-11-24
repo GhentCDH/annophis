@@ -1,4 +1,4 @@
-import { Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { jwtVerify } from 'jose';
@@ -20,7 +20,8 @@ export type Caller =
  */
 @Injectable()
 export class ServiceAuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  // explicit token: tsx (pnpm dev) emits no decorator metadata
+  constructor(@Inject(Reflector) private readonly reflector: Reflector) {}
 
   async canActivate(ctx: ExecutionContext) {
     if (process.env['SERVICE_AUTH'] === 'off') return true;

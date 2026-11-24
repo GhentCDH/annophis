@@ -6,10 +6,11 @@ import { EVENTS_OPTIONS, EventBus } from '@annophis/events';
 import type { EventsOptions } from '@annophis/events';
 import { Public, ServiceAuthGuard } from '@annophis/service-auth';
 
+// Explicit @Inject everywhere: `pnpm dev` runs tsx (esbuild), which emits no decorator metadata.
 @Controller()
 class HealthController {
   constructor(
-    private readonly bus: EventBus,
+    @Inject(EventBus) private readonly bus: EventBus,
     @Inject(EVENTS_OPTIONS) private readonly o: EventsOptions,
   ) {}
 
@@ -32,7 +33,7 @@ class HelloListener implements OnApplicationBootstrap {
   private readonly log = new Logger('Hello');
 
   constructor(
-    private readonly bus: EventBus,
+    @Inject(EventBus) private readonly bus: EventBus,
     @Inject(EVENTS_OPTIONS) private readonly o: EventsOptions,
   ) {}
 
