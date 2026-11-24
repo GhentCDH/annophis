@@ -1,12 +1,12 @@
 {
-  "name": "@annophis/backend",
+  "name": "@gateway/backend",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "prisma:migrate": "npx prisma migrate dev --config prisma/default/prisma.config.ts"
   },
   "dependencies": {
-    "@ghentcdh/crouton-api": "0.2.0-rc.2",
+    "@ghentcdh/crouton-api": "0.2.0-rc.4",
     "@nestjs/common": "^12.4.0",
     "@nestjs/config": "^12.1.1",
     "@nestjs/core": "^12.4.0",
@@ -21,7 +21,7 @@
     "rxjs": "^7.0.0",
     "tslib": "^2.9.1",
     "zod": "^4.0.0",
-    "@annophis/generated-default-types": "workspace:*"
+    "@gateway/generated-default-types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

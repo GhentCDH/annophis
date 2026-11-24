@@ -1,0 +1,128 @@
+# Common mistakes
+
+## 1. Using removed root keys
+
+Many root keys moved. Run `crouton validate` to detect them — it reports the correct replacement path for each key.
+
+| Wrong (old)                             | Right (new)                                                                                    |
+|-----------------------------------------|------------------------------------------------------------------------------------------------|
+| `"model": "Book"` at root               | `"source": { "model": "Book" }`                                                                |
+| `"database": "main"` at root            | `"source": { "datasource": "main" }`                                                           |
+| `"table": "books"` at root              | `"source": { "dbTable": "books" }`                                                             |
+| `"idType": "number"` at root            | `"source": { "idType": "number" }`                                                             |
+| `"display": { "mode": "page" }` at root | `"layout": { "view": { "container": { "mode": "page" } } }`                                    |
+| `"modalSize": "lg"` at root             | `"layout": { "form": { "container": { "size": "lg" } } }`                                      |
+| `"include": ["author"]` at root         | `"operations": { "findAll": { "include": ["author"] }, "findOne": { "include": ["author"] } }` |
+| `"calculatedColumns": [...]`            | `"columns": { "myCol": { "computed": { "sql": "..." } } }`                                     |
+| `column.showInLookup: true`             | `"lookup": { "labels": ["colId"] }` on resource root                                           |
+
+## 2. Putting relation config in fieldInput instead of column.relation
+
+`fieldInput` only configures the UI widget. Relation data model belongs in `column.relation`.
+
+```json
+// WRONG
+"authorId": {
+  "fieldInput": {
+    "type": "autocomplete",
+    "relationType": "manyToOne",
+    "resource": "./author/resource.json",
+    "foreignKey": "authorId"
+  }
+}
+
+// RIGHT
+"authorId": {
+  "relation": {
+    "resource": "./author/resource.json",
+    "type": "manyToOne",
+    "foreignKey": "authorId",
+    "displayKey": "name"
+  },
+  "fieldInput": { "type": "autocomplete" }
+}
+```
+
+## 3. Using `format: "relation"` to detect relations
+
+`fieldInput.format` is removed. Use `isRelation(col)` from `@ghentcdh/crouton-core` or check `!!col.relation`.
+
+## 4. Duplicating labels for a restricted enum
+
+`enum` resolves a shared list from `crouton.enums.json` at load time. To limit the enum for one
+screen, add a local `fieldInput.options.values` restriction — plain strings are resolved against
+the enum (labels come from the registry), unknown values warn:
+
+```json
+"status": {
+  "enum": "bookStatus",
+  "fieldInput": {
+    "type": "select",
+    "options": { "values": ["draft", "published"] }
+  }
+}
+```
+
+Duplicate full `{ value, label }` lists only when labels intentionally differ from the enum.
+
+Note: labels for values **outside** the restriction still resolve (the loader keeps the full enum
+in `fieldInput.options.displayValues`), but rows carrying such a legacy value cannot be edited
+from this screen — the table's built-in edit button is hidden for them.
+
+## 5. Hand-editing auto-generated columns
+
+`crouton update` owns columns derived from Prisma. Edits to column names or types are overwritten on the next
+`crouton update`.
+Only edit `fieldInput`, `label`, `hidden`, `required`, `relation` inside each column entry.
+
+## 6. `kind: "custom"` when you need `adapter: "custom"`
+
+`kind: "custom"` = this resource has a custom `repository.ts`.
+If your data source is external (not Prisma), set `adapter: "custom"` in `data-source.json` instead.
+
+## 7. Typos in fieldInput type
+
+The `type` value is case-sensitive: `autocomplete` not `Autocomplete`; `select` not `Select`.
+Run `crouton validate` — it reports unknown fieldInput types.
+
+## 8. Missing `crouton validate` after edits
+
+Schema violations, unknown resources in relations, and broken references are only caught by the validator.
+Always run `crouton validate` after any change to `resource.json` or `crouton.json`.
+
+## 9. Wrong relation direction
+
+`manyToOne`: FK is on **this** resource. `oneToMany`: FK is on the **target** resource.
+Swapping them causes the relation panel to query the wrong table.
+
+## 10. `colspan`/`rowspan`/`hideLabel` on table-node items
+
+These form-layout options have no effect on items of the **`type: "table"` node** and are rejected there with a
+validation error — use `width`, `align`, `truncate` for table-specific display. `colspan` is fine on items of a
+**wrapper grid** around the table (e.g. `{ "component": "CreateByIsbn", "colspan": 12 }`).
+
+## 11. Table/column settings on the wrapper instead of the table node
+
+In a wrapper table layout, `rowActions`, `tableActions`, `pageSize` etc.
+belong on the **`type: "table"` node**, not on the outer wrapper.
+
+## 12. Placement keys on a column, or `hiddenIn*` under a layout
+
+`position`, `hideLabel`, `fieldInput.position` and `fieldInput.options.{colspan,rowspan,width,hideLabel,readonly,label}`
+on a column fail validation. Put order and placement on `layout.<ctx>.items` (`{ "id": "title", "colspan": 6 }`).
+When `layout.<ctx>` exists, `hiddenIn<Ctx>` does nothing — add or remove the id in `layout.<ctx>.items` instead.
+
+## 13. `beforeWrite` that assumes `data` is set
+
+`beforeWrite` also runs before a delete, with `data === undefined` and `ctx.op === 'delete'` — throw there to block
+the delete. Guard before touching `data`:
+
+```ts
+beforeWrite: async (data, ctx) => {
+  if (ctx.op === 'delete') return data;
+  return { ...data, updatedBy: ctx.request.user.email };
+},
+```
+
+Sub-resource hooks (`hooks/<child>.ts`) run on the nested routes too, including `beforeFindAll` / `afterFindAll`
+on `GET /<parent>/:id/<child>` with `ctx.parent` set.

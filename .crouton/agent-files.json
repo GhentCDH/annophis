@@ -1,0 +1,34 @@
+{
+  ".claude/skills/crouton/SKILL.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "ed11c7caf3d58e219cf9e20cc9b894889975236997dad3095c47e7be7044bdc1"
+  },
+  ".claude/skills/crouton/references/common-mistakes.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "fda2fb839030f4c4f1a40da05350a80497ff78547c2117cddf3a1c2ee2efa812"
+  },
+  ".claude/skills/crouton/references/data-sources.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "5b8fdb9cd6fba7ff6ca3f0e9da5525511abdc6d884f0acfbefc13ea8d32bc392"
+  },
+  ".claude/skills/crouton/references/field-inputs.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "5761d8efd2c913825b774af5d2ede3754e17da1c0059a05586b0931c729130c7"
+  },
+  ".claude/skills/crouton/references/recipes.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "5da596ea545a8eb4500cc10b4c9a9deb5919756045fce44d0f4d351a478df951"
+  },
+  ".claude/skills/crouton/references/relations.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "2d00d6a782620a34fa3c7396af1d15dc0496bf5f2723a1d06cfdef62ea09cb23"
+  },
+  ".claude/skills/crouton/references/resource-json.md": {
+    "version": "0.2.0-rc.4",
+    "hash": "653f9106311cb4cc80bcf848394e8574d7d0d4d67ef436c6128500a860a3e408"
+  },
+  ".cursor/rules/crouton.mdc": {
+    "version": "0.2.0-rc.4",
+    "hash": "8c5e436163b2945a80f0a701bfdf45cbcd10cb88bda471024116e8a12d9fda4b"
+  }
+}

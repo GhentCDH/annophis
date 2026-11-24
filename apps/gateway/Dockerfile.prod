@@ -31,7 +31,7 @@ RUN cd apps/gateway && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dumm
 RUN npx nx build gateway-backend && npx nx build gateway-frontend
 
 # Create flat node_modules for backend (no pnpm symlinks)
-RUN pnpm --filter @annophis/backend deploy --legacy --prod /app/deployed-backend
+RUN pnpm --filter @gateway/backend deploy --legacy --prod /app/deployed-backend
 
 # Transpile resource & data-source .ts → .js for runtime require()
 COPY apps/gateway/crouton-backend/src/app/resources /app/dist/apps/gateway/crouton-backend/resources
@@ -69,9 +69,9 @@ COPY --from=build /app/dist/apps/gateway/crouton-backend ./backend
 COPY --from=build /app/deployed-backend/node_modules ./node_modules
 COPY --from=build /app/generated/gateway/default/client ./generated/client
 # Not a workspace package (see pnpm-workspace.yaml) — place it where the
-# runtime-required data-sources resolve `@annophis/generated-default-client`.
-COPY --from=build /app/generated/gateway/default/client ./node_modules/@annophis/generated-default-client
-COPY --from=build /app/generated/gateway/default/types ./node_modules/@annophis/generated-default-types
+# runtime-required data-sources resolve `@gateway/generated-default-client`.
+COPY --from=build /app/generated/gateway/default/client ./node_modules/@gateway/generated-default-client
+COPY --from=build /app/generated/gateway/default/types ./node_modules/@gateway/generated-default-types
 COPY --from=build /app/apps/gateway/crouton-frontend/dist /srv/frontend
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
