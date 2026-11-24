@@ -3,12 +3,26 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/e2e/src",
-  "tags": ["scope:e2e", "type:e2e"],
-  "implicitDependencies": ["gateway-backend", "gateway-frontend"],
+  "tags": [
+    "scope:e2e",
+    "type:e2e"
+  ],
+  "implicitDependencies": [
+    "gateway-backend",
+    "gateway-frontend"
+  ],
   "targets": {
     "e2e": {
-      "command": "playwright test",
-      "options": { "cwd": "{projectRoot}" }
+      "command": "playwright test --project=setup --project=chromium",
+      "options": {
+        "cwd": "{projectRoot}"
+      }
+    },
+    "contract": {
+      "command": "playwright test --project=contract",
+      "options": {
+        "cwd": "{projectRoot}"
+      }
     }
   }
 }

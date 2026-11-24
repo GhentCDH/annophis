@@ -69,7 +69,9 @@ pnpm nx run-many -t lint typecheck test build
 pnpm nx affected -t lint typecheck test build --base=origin/main
 pnpm nx run <svc>-backend:serve
 docker compose up
-pnpm nx e2e e2e      # Playwright, against the running stack
+pnpm nx run e2e:contract   # provider contract tests against the running stack
+pnpm nx e2e e2e            # Playwright browser flows, against the running stack
+pnpm nx run events:integration  # EventBus against real NATS
 ```
 
 ## MCP servers (`.mcp.json`)

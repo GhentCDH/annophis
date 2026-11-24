@@ -17,6 +17,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    // API-only provider contract tests (nx run e2e:contract); no browser, no login
+    { name: 'contract', testMatch: /.*\.contract\.ts/ },
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
     { name: 'chromium', use: { ...devices['Desktop Chrome'] }, dependencies: ['setup'] },
   ],

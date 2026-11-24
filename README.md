@@ -72,7 +72,7 @@ docker compose start keycloak
 | Workflow | When | What |
 |---|---|---|
 | `ci.yml` | every PR, push to main | lint, typecheck, test, build (crouton shared CI) |
-| `e2e.yml` | every PR, push to main | infra in Docker + all services via `pnpm dev`, then Playwright (`apps/e2e`); report uploaded on failure |
+| `e2e.yml` | every PR, push to main | infra in Docker + all services via `pnpm dev`, then event-bus integration tests, provider contract tests and Playwright (`apps/e2e`); report uploaded on failure |
 | `docker-build.yml` | tag `v*` | one image per service to `ghcr.io/<owner>/annophis-<svc>`, then a GitHub release from Conventional Commits |
 | `labeler.yml`, `pr-title.yml` | PRs | labels from branch/files/title; title must be a Conventional Commit |
 
