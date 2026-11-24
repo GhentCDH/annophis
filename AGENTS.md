@@ -60,7 +60,7 @@ Plain markdown; any agent can read them.
 
 | Skill | Use when |
 |---|---|
-| `crouton` | changing `resource.json`, `data-source.json` or `crouton.json` (symlink to the installed crouton version) |
+| `crouton` | changing `resource.json`, `data-source.json` or `crouton.json` (synced by crouton, tracked in `.crouton/agent-files.json`) |
 | `annophis-add-service` | adding a new service under `apps/` |
 | `annophis-lib` | adding a shared lib under `libs/` |
 
@@ -75,8 +75,8 @@ Contract, event and service-auth skills arrive together with those libs.
 <!-- crouton configuration start -->
 <!-- Leave the start & end comments to automatically receive updates. -->
 # crouton
-- Resources live in `<resourcesDir>`, data sources in `<dataSourcesDir>` (see each `apps/<svc>/crouton.json`).
+- Resources live in `apps/gateway/crouton-backend/src/app/resources`, data sources in `apps/gateway/crouton-backend/src/app/data-sources` (see `crouton.json`).
 - Use the `crouton` skill for any resource/datasource change.
 - After editing any `resource.json` or `crouton.json`, run `crouton validate`.
-- Docs for the installed version: `node_modules/@ghentcdh/crouton-core/agent-docs/README.md`
+- Docs for the installed version: `node_modules/@ghentcdh/crouton-cli/agent-docs/README.md`
 <!-- crouton configuration end -->

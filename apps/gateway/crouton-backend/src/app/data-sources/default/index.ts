@@ -1,4 +1,4 @@
-import { PrismaClient } from '@annophis/generated-default-client';
+import { PrismaClient } from '@gateway/generated-default-client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const connectionString = process.env.DATABASE_URL ?? '';

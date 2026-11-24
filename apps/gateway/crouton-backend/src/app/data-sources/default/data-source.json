@@ -4,7 +4,7 @@
   "default": true,
   "prismaSchema": "prisma/default/schema.prisma",
   "urlEnv": "DATABASE_URL",
-  "generatedTypesImport": "@annophis/generated-default-types",
+  "generatedTypesImport": "@gateway/generated-default-types",
   "zodOutput": "../../generated/gateway/default/types/src",
   "clientOutput": "../../generated/gateway/default/client",
   "prismaConfig": "prisma/default/prisma.config.ts"
