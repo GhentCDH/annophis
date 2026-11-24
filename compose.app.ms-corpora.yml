@@ -29,8 +29,14 @@ services:
       - "${BACKEND_PORT:-3002}:${BACKEND_PORT:-3002}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/ms-corpora; pnpm exec nx run ms-corpora-backend:serve"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
     environment:
       - NX_COMMAND=ms-corpora-backend:serve
+      # .env points at localhost for `pnpm dev`; inside the network use service hostnames
+      - DATABASE_URL=postgresql://ms_corpora:dev@postgres:5432/annophis?schema=ms_corpora
+      - NATS_URL=nats://nats:4222
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:

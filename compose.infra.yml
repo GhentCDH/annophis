@@ -1,0 +1,55 @@
+# Local infrastructure for Annophis (dev only — credentials are not secrets).
+# Started together with all services by `docker compose up` (see compose.yml).
+networks:
+  annophis-net:
+    name: annophis-net
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: annophis
+      POSTGRES_PASSWORD: annophis
+      POSTGRES_DB: annophis
+    ports: ["5442:5432"]
+    volumes:
+      - ./var/pgdata:/var/lib/postgresql/data
+      # one user + schema per service; runs only on an empty volume (rm -rf var/pgdata to re-run)
+      - ./docker/init-data:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U annophis -d annophis"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [annophis-net]
+
+  nats:
+    image: nats:2-alpine
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    ports: ["4222:4222", "8222:8222"]
+    volumes: ["./var/nats:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [annophis-net]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports: ["8080:8080"]
+    volumes:
+      - ./docker/keycloak:/opt/keycloak/data/import:ro
+      - ./var/keycloak:/opt/keycloak/data/h2
+    healthcheck:
+      # the image has no curl/wget; probe the management port with bash
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks: [annophis-net]

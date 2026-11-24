@@ -19,3 +19,38 @@
 Development by [Ghent Centre for Digital Humanities - Ghent University](https://www.ghentcdh.ugent.be/). Funded by the [GhentCDH research projects](https://www.ghentcdh.ugent.be/projects).
 
 <img src="https://www.ghentcdh.ugent.be/ghentcdh_logo_blue_text_transparent_bg_landscape.svg" alt="Landscape" width="500">
+
+## Development
+
+Requirements: Node 24, pnpm ≥ 12, Docker.
+
+```sh
+pnpm install
+docker compose up            # Postgres, NATS, Keycloak and every service (dev mode, hot reload)
+```
+
+| What | URL |
+|---|---|
+| Gateway UI | http://localhost:4200 |
+| Service backends | http://localhost:3000 (gateway), 3001–3004 (`ms-*`), 3010/3011 (text services), 3020 (ml-adapter) |
+| Keycloak | http://localhost:8080 (console `admin`/`admin`; realm `annophis`, users `admin`/`admin`, `viewer`/`viewer`) |
+| NATS monitoring | http://localhost:8222 |
+| Postgres | `localhost:5442`, database `annophis`, one schema + user per service (password `dev`) |
+
+To run infra in Docker and the apps on the host: `docker compose up postgres nats keycloak`, then `pnpm dev`.
+
+Postgres and Keycloak read their init files only on an empty volume. To reset: `docker compose down && rm -rf var`.
+
+### Changing the Keycloak realm
+
+Edit the realm in the console, then export it back to `docker/keycloak/annophis-realm.json`:
+
+```sh
+docker compose stop keycloak
+docker compose run --rm --entrypoint /opt/keycloak/bin/kc.sh \
+  -v "$PWD/docker/keycloak:/opt/keycloak/data/import" keycloak \
+  export --dir /opt/keycloak/data/import --realm annophis --users realm_file
+docker compose start keycloak
+```
+
+The development guide for coding agents is [AGENTS.md](AGENTS.md).

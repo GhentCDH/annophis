@@ -1,0 +1,63 @@
+{
+  "realm": "annophis",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "sslRequired": "external",
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Annophis administrator: access to the admin UIs" },
+      { "name": "editor", "description": "Can create and edit annotations" },
+      { "name": "viewer", "description": "Read-only access" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "annophis-ui",
+      "name": "Annophis UI",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["+"],
+      "attributes": { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "http://localhost:*" }
+    },
+    {
+      "clientId": "annophis-gateway",
+      "name": "Annophis gateway (BFF)",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dev-gateway-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["+"],
+      "attributes": { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "http://localhost:*" }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@annophis.local",
+      "emailVerified": true,
+      "firstName": "Annophis",
+      "lastName": "Admin",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["admin", "editor", "viewer", "default-roles-annophis"]
+    },
+    {
+      "username": "viewer",
+      "email": "viewer@annophis.local",
+      "emailVerified": true,
+      "firstName": "Annophis",
+      "lastName": "Viewer",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "viewer", "temporary": false }],
+      "realmRoles": ["viewer", "default-roles-annophis"]
+    }
+  ]
+}

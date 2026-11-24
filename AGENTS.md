@@ -79,9 +79,11 @@ Contract, event and service-auth skills arrive together with those libs.
 | text-service-2 | 3011 | 4211 |
 | ml-adapter | 3020 | none (API only) |
 
-Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name.
+Infra (`compose.infra.yml`): Postgres `5442` (DB `annophis`), NATS `4222` (monitoring `8222`), Keycloak `8080` (realm `annophis`).
 
-**Root agent files (crouton issue 16).** `.claude/skills/crouton`, `.cursor/rules/crouton.mdc` and the crouton block below are written by crouton. They name *one* project's paths. For any service, read `apps/<svc>/crouton.json` for its resources and data-sources dirs.
+Each service uses Postgres schema `<svc>` with `-` replaced by `_`, owned by a user of the same name (password `dev`). `docker/init-data/01-schemas.sql` creates them. Inside Docker, the compose files override `DATABASE_URL` and `NATS_URL` to use the `postgres` and `nats` hosts; `.env` uses `localhost` for `pnpm dev`.
+
+**Root agent files (GhentCDH/crouton#690).** `.claude/skills/crouton`, `.cursor/rules/crouton.mdc` and the crouton block below are written by crouton. They name *one* project's paths. For any service, read `apps/<svc>/crouton.json` for its resources and data-sources dirs.
 
 <!-- crouton configuration start -->
 <!-- Leave the start & end comments to automatically receive updates. -->

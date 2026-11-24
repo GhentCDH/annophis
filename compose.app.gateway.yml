@@ -29,8 +29,14 @@ services:
       - "${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}"
     # The Prisma client is git-ignored: generate it before serving (serve even if it fails, errors show on /crouton/status).
     command: sh -c "pnpm exec crouton generate --yes --cwd apps/gateway; pnpm exec nx run gateway-backend:serve"
+    depends_on:
+      postgres: { condition: service_healthy }
+      nats: { condition: service_healthy }
     environment:
       - NX_COMMAND=gateway-backend:serve
+      # .env points at localhost for `pnpm dev`; inside the network use service hostnames
+      - DATABASE_URL=postgresql://gateway:dev@postgres:5432/annophis?schema=gateway
+      - NATS_URL=nats://nats:4222
       - WATCHPACK_POLLING=true
       - IS_DOCKER=true
     volumes:
