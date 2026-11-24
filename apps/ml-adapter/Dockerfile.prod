@@ -23,6 +23,9 @@ FROM --platform=$BUILDPLATFORM deps AS build
 ENV PRISMA_CLI_BINARY_TARGETS="linux-musl,linux-musl-arm64-openssl-3.0.x"
 
 COPY . .
+# Only this app's dependencies are installed: drop the other apps so Nx doesn't load their configs
+# (e.g. another app's vite.config.ts) while building the project graph.
+RUN find apps -mindepth 1 -maxdepth 1 ! -name ml-adapter -exec rm -rf {} +
 
 # Generate Prisma client for Linux
 RUN cd apps/ml-adapter && DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate --config prisma/default/prisma.config.ts
@@ -53,7 +56,7 @@ RUN find apps/ml-adapter/crouton-backend/src/app/data-sources -name 'index.ts' \
     && find /app/dist/apps/ml-adapter/crouton-backend/data-sources -name '*.ts' -delete
 
 # Transpile generated types .ts → .js
-RUN find /app/generated/ml-adapter/default/types/src -name '*.ts' \
+RUN mkdir -p /app/generated/ml-adapter/default/types/src && find /app/generated/ml-adapter/default/types/src -name '*.ts' \
     | while read f; do \
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
@@ -83,8 +86,19 @@ COPY --from=build /app/generated/ml-adapter/default/types ./node_modules/@ml-ada
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ml-adapter/crouton.json apps/ml-adapter/crouton.enums.json ./
+# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
+COPY apps/ml-adapter/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
+COPY apps/ml-adapter/prisma ./prisma
 
 EXPOSE 3000
 
-CMD ["node", "backend/main.js"]
+COPY --chmod=755 <<'EOF' /usr/local/bin/annophis-start
+#!/bin/sh
+# `migrate` -> apply this app's Prisma migrations and exit; anything else -> start the app
+if [ "$1" = migrate ]; then
+  exec node /app/node_modules/prisma/build/index.js migrate deploy --config /app/prisma/default/prisma.config.ts
+fi
+exec node /app/backend/main.js
+EOF
+ENTRYPOINT ["annophis-start"]
 

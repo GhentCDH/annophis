@@ -12,6 +12,11 @@
         file_server
     }
 
+    # The gateway backend (same container): admin facade, auth, /<svc>/* proxy, /health/services
+    handle_path /api/* {
+        reverse_proxy localhost:3000
+    }
+
     handle /* {
         try_files {path} {path} / /index.html
         file_server

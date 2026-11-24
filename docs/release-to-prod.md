@@ -36,17 +36,16 @@ flowchart LR
 flowchart TB
   user([Browser]) --> lb["Nomad LB<br/>annophis.ghentcdh.ugent.be"]
   subgraph job["Nomad job 'annophis' · group 'annophis' (private network)"]
-    nginx["nginx sidecar :80<br/>/ → gateway UI · /api → gateway backend"]
-    gw["task gateway<br/>image annophis-gateway<br/>UI :9000 · backend :3000"]
+    gw["task gateway<br/>image annophis-gateway<br/>Caddy :9000 (UI + /api) → backend :3000"]
     s1["task ms-projects"]
     s2["task ms-corpora"]
     s3["task ms-annotation · ms-metadata"]
     s4["task text-service-1 · text-service-2"]
     s5["task ml-adapter"]
     nats{{"task nats<br/>JetStream"}}
-    mig["prestart task: migrate<br/>prisma migrate deploy (all services)"]
+    mig["prestart tasks #lt;app#gt;-migrate<br/>image #lt;app#gt; with arg 'migrate'"]
   end
-  lb --> nginx --> gw
+  lb --> gw
   gw -- "/#lt;svc#gt;/* (facade proxy)" --> s1 & s2 & s3 & s4 & s5
   s1 & s2 & s3 & s4 & s5 & gw <-.-> nats
   job --> pg[("central Postgres<br/>db annophis, schema per service")]
@@ -59,47 +58,26 @@ flowchart TB
 | `compose.infra.yml` Postgres container | central GhentCDH Postgres. DB `annophis` with a user and schema per service, created once by the DBA. |
 | Keycloak container, realm JSON auto-imported | shared `auth.ghentcdh.ugent.be`: import `docker/keycloak/annophis-realm.json` once, then set production redirect URIs and secrets. No dev users. |
 | NATS container | `nats` task in the group, with JetStream storage on a CSI volume (see `volumes/` in the nomad-jobs repo). JetStream prefers local disk, so check NFS performance or use a host volume. |
-| Vite proxy `/api` → gateway backend | nginx sidecar `/api` → gateway backend, as in `new_polities`. The gateway image's Caddy only serves the UI. |
+| Vite proxy `/api` → gateway backend | the gateway image's Caddy serves the UI and proxies `/api` → gateway backend in the same container, so no nginx sidecar is needed |
 | `.env.example` defaults | Vault `kv_nomad/ghentcdh/annophis`, rendered into each task's env with a `template` block |
 | service URLs from `ANNOPHIS_<SVC>_URL` (compose: `http://<svc>-backend:<port>`) | the same env vars, e.g. `ANNOPHIS_MS_PROJECTS_URL=http://{{ env "NOMAD_ADDR_ms_projects" }}` |
-| backends run `prisma migrate deploy` on start (compose command) | `migrate` **prestart** task before the services start (**TODO (phase 1)**). The prod images don't migrate. |
+| backends run `prisma migrate deploy` on start (compose command) | every image accepts the argument `migrate` (`prisma migrate deploy`, then exit): a prestart task per app in Nomad, a `<app>-migrate` one-shot in `compose.prod.yml` |
 
-### Sketch of the job template
+### The job template
 
-```hcl
-# annophis/job.nomad.hcl.j2 (sketch, follows new_polities)
-[% from "base/network.j2" import network_block -%]
-[% from "base/task.j2" import task_podman -%]
+A copy-ready draft lives in [`deploy/nomad/annophis/`](../deploy/nomad/annophis/README.md): `job.nomad.hcl.j2` plus `tst`/`qas`/`prd` vars. The template loops over an `apps` list (name, port, memory, image), so adding a service is one entry in the vars files.
 
-job "[[ job_name ]]" {
-  type      = "service"
-  namespace = "ghentcdh"
-  vault {}
-  update { stagger = "30s"  max_parallel = 1 }
+### Trying the production images locally: `compose.prod.yml`
 
-  group "annophis" {
-    [[ network_block(network="private", ports={
-         "http": {"to": 80}, "gateway_ui": {"to": 9000}, "gateway_api": {"to": 3000},
-         "ms_projects": {"to": 6101}, "ms_corpora": {"to": 6102}, "nats": {"to": 4222} }) ]]
+`compose.prod.yml` runs exactly what Nomad will run: the 8 images, NATS, and the `<app>-migrate` one-shots, with only the gateway published. Postgres and Keycloak are external (`.env.prod`, see `.env.prod.example`). `compose.prod.smoke.yml` adds throwaway Postgres and Keycloak for a self-contained test, and CI runs it on every PR that touches the apps (`docker-build.yml` → *Smoke test compose.prod.yml*):
 
-    task "gateway"     { [[ task_podman(image=images.gateway,     memory=512, ports=["gateway_ui", "gateway_api"]) ]] }
-    task "ms-projects" { [[ task_podman(image=images.ms_projects, memory=384, ports=["ms_projects"]) ]] }
-    # … one task per service, each with a template { … secret "kv_nomad/ghentcdh/annophis" … } env block
-    task "nats"        { /* nats:2-alpine -js -sd /data, CSI volume */ }
-    task "migrate"     { lifecycle { hook = "prestart" }  /* prisma migrate deploy per service */ }
-    task "nginx"       { /* sidecar: / → NOMAD_ADDR_gateway_ui, /api → NOMAD_ADDR_gateway_api;
-                            service with tags ["nomad-lb"], meta nomad-lb-vhost-fqdn = annophis[.<env>].ghentcdh.ugent.be */ }
-  }
-}
-```
-
-```yaml
-# annophis/prd.vars.yaml
-version: 0.1.0
-images:
-  gateway:     nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-gateway:0.1.0
-  ms_projects: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ms-projects:0.1.0
-  # …
+```sh
+for a in gateway ms-projects ms-corpora ms-annotation ms-metadata text-service-1 text-service-2 ml-adapter; do
+  docker build -f "apps/$a/Dockerfile.prod" -t "annophis-$a:test" .
+done
+ANNOPHIS_IMAGE_PREFIX= ANNOPHIS_VERSION=test ANNOPHIS_PORT=6299 ANNOPHIS_ENV_FILE=.env.prod.example \
+  docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example up -d --wait
+curl localhost:6299/api/health/services
 ```
 
 ## Configuration and secrets
@@ -129,13 +107,13 @@ Every task gets its env from Vault (`kv_nomad/ghentcdh/annophis`):
 - Services, NATS and the migrate task have no load-balancer service, so they're only reachable inside the group.
 - Health: the Nomad service check calls the gateway's `GET /api/health/services`. It returns 200 only when the gateway and every service are up and connected to NATS, and 503 otherwise.
 
-## TODO before the first deploy (phase 1)
+## TODO before the first deploy
 
-1. ~~The gateway reads service URLs from env~~: done (`ANNOPHIS_<SVC>_URL`).
-2. A migrate step for production (prestart task or entrypoint flag), since the prod images don't run `prisma migrate deploy`.
+1. ~~Gateway reads service URLs from env~~: done (`ANNOPHIS_<SVC>_URL`).
+2. ~~Migrate step for production~~: done (image argument `migrate`; prestart tasks / `<app>-migrate`).
 3. Confirm Nexus ↔ ghcr image pulls with the infra team.
-4. Create the `annophis` folder in the nomad-jobs repo (`job.nomad.hcl.j2` plus `tst`/`qas`/`prd` vars) and the Vault secrets.
-5. Create the DB `annophis` (users, schemas, `GRANT CREATE ON DATABASE`) on the central Postgres, and the realm `annophis` on `auth.ghentcdh.ugent.be`.
+4. Copy `deploy/nomad/annophis/` to the nomad-jobs repo, check the `base/` macro arguments, and create the Vault secrets.
+5. Create the DB `annophis` (users, schemas, `GRANT CREATE ON DATABASE`) on the central Postgres, and the realm `annophis` on `auth.ghentcdh.ugent.be` with production redirect URIs.
 6. NATS JetStream storage: a CSI volume or host volume, plus a retention policy for stream `ANNOPHIS`.
-7. ~~Aggregated health endpoint~~: done (`/health/services`). Still to do: a smoke test, i.e. the e2e suite against `tst`.
+7. ~~Aggregated health endpoint~~: done (`/api/health/services`, the Nomad check). ~~Image build and smoke test in CI~~: done. Still to do: the e2e suite against `tst`.
 8. Register the application, domains and healthchecks in auto (`auto:audit` skill, or the `auto` MCP server in `.mcp.json`).

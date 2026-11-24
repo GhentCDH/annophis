@@ -1,0 +1,45 @@
+---
+# Annophis prd: bump `version` to deploy a release (the same tag moves tst → qas → prd).
+version: 0.1.0
+fqdn: annophis.ghentcdh.ugent.be
+apps:
+  - name: gateway
+    env: GATEWAY
+    port: 3000
+    memory: 512
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-gateway:0.1.0
+  - name: ms-projects
+    env: MS_PROJECTS
+    port: 6101
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ms-projects:0.1.0
+  - name: ms-corpora
+    env: MS_CORPORA
+    port: 6102
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ms-corpora:0.1.0
+  - name: ms-annotation
+    env: MS_ANNOTATION
+    port: 6103
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ms-annotation:0.1.0
+  - name: ms-metadata
+    env: MS_METADATA
+    port: 6104
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ms-metadata:0.1.0
+  - name: text-service-1
+    env: TEXT_SERVICE_1
+    port: 6110
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-text-service-1:0.1.0
+  - name: text-service-2
+    env: TEXT_SERVICE_2
+    port: 6111
+    memory: 384
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-text-service-2:0.1.0
+  - name: ml-adapter
+    env: ML_ADAPTER
+    port: 6120
+    memory: 512
+    image: nexus.ugent.be/docker-group-nomad-prd/ghentcdh/annophis-ml-adapter:0.1.0

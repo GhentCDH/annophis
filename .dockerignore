@@ -1,6 +1,8 @@
 node_modules
 dist
 generated
+# …except the committed workspace package.json of the generated types (pnpm deploy resolves them)
+!generated/*/*/types/package.json
 .env
 .env.*
 .env.local

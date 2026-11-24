@@ -1,14 +1,29 @@
-# Builds one production image per service (backend + its admin frontend behind Caddy) on a v* tag,
-# pushes ghcr.io/<owner>/annophis-<service>:<version>, then creates a GitHub release from Conventional Commits.
+# Production images: one per app (backend; the gateway also serves the admin UI behind Caddy).
+# - tag v*: multi-arch build, push ghcr.io/<owner>/annophis-<app>:<version>, then a GitHub release.
+# - pull request: amd64 build without push, then a smoke test of compose.prod.yml with those images.
 name: Docker
 
 on:
   push:
     tags: ['v*']
+  pull_request:
+    paths:
+      - 'apps/**'
+      - 'libs/**'
+      - 'generated/**'
+      - 'docker/**'
+      - '**/Dockerfile*'
+      - '.dockerignore'
+      - 'compose.prod*.yml'
+      - '.env.prod.example'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docker-build.yml'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+  IS_RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
 jobs:
   build-and-push:
@@ -39,6 +54,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
+        if: env.IS_RELEASE == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -56,6 +72,7 @@ jobs:
             type=raw,value=latest
 
       - name: Build and push ${{ matrix.service }}
+        if: env.IS_RELEASE == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -70,8 +87,79 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
+      - name: Build ${{ matrix.service }} (PR, no push)
+        if: env.IS_RELEASE != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile.prod
+          platforms: linux/amd64
+          tags: annophis-${{ matrix.service }}:ci
+          build-args: |
+            VERSION=pr-${{ github.event.pull_request.number }}
+            BUILD_SHA=${{ github.sha }}
+          outputs: type=docker,dest=/tmp/annophis-${{ matrix.service }}.tar
+          cache-from: type=gha,scope=${{ matrix.service }}
+
+      - name: Keep the image for the smoke test
+        if: env.IS_RELEASE != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ matrix.service }}
+          path: /tmp/annophis-${{ matrix.service }}.tar
+          retention-days: 1
+
+  smoke:
+    # The production stack (compose.prod.yml) with the PR's images and throwaway infra (compose.prod.smoke.yml)
+    name: Smoke test compose.prod.yml
+    if: github.event_name == 'pull_request'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANNOPHIS_IMAGE_PREFIX: ''
+      ANNOPHIS_VERSION: ci
+      ANNOPHIS_ENV_FILE: .env.prod.example
+      ANNOPHIS_PORT: '6200'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: image-*
+          path: /tmp/images
+          merge-multiple: true
+
+      - name: Load images
+        run: for f in /tmp/images/*.tar; do docker load -i "$f"; done
+
+      - name: Start the production stack
+        run: |
+          echo "127.0.0.1 keycloak.localhost" | sudo tee -a /etc/hosts
+          docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example up -d --wait
+
+      - name: Check health, UI, auth and login
+        run: |
+          set -e
+          check() { code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:6200$1"); echo "$1 → $code"; [ "$code" = "$2" ]; }
+          curl -sf http://localhost:6200/api/health/services | tee /tmp/health.json | jq -e '.status == "ok" and (.services | length) == 8'
+          check / 200
+          check /config.json 200
+          check /api/ms-projects/project 403          # crouton admin guard (auth providers present)
+          check /api/ms-projects/hello 401            # ServiceAuthGuard
+          check /api/_app/auth/keycloak/login 302     # Keycloak server login
+
+      - name: Logs
+        if: failure()
+        run: docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example logs --tail 80
+
+      - name: Stop
+        if: always()
+        run: docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example down -v
+
   create-release:
     name: Create GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs: build-and-push
     permissions:

@@ -67,13 +67,17 @@ docker compose start keycloak
 
 **The admin UIs are internal tools.** They write to the databases directly. Only users with the Keycloak `admin` role get in, and they must never be exposed publicly.
 
+### Production images
+
+One image per app (`apps/<app>/Dockerfile.prod`); the gateway image serves the UI and `/api`. `compose.prod.yml` runs the production stack (copy `.env.prod.example` → `.env.prod`), and `deploy/nomad/annophis/` is the Nomad job. Every image accepts the argument `migrate` to apply its database migrations. See [docs/release-to-prod.md](docs/release-to-prod.md).
+
 ### CI
 
 | Workflow | When | What |
 |---|---|---|
 | `ci.yml` | every PR, push to main | lint, typecheck, test, build (crouton shared CI) |
 | `e2e.yml` | every PR, push to main | infra in Docker + all services via `pnpm dev`, then event-bus integration tests, provider contract tests and Playwright (`apps/e2e`); report uploaded on failure |
-| `docker-build.yml` | tag `v*` | one image per service to `ghcr.io/<owner>/annophis-<svc>`, then a GitHub release from Conventional Commits |
+| `docker-build.yml` | tag `v*`; PRs touching apps | tag: one multi-arch image per app to `ghcr.io/<owner>/annophis-<app>` plus a GitHub release. PR: build all images and smoke-test `compose.prod.yml` (health, UI, auth, login) |
 | `labeler.yml`, `pr-title.yml` | PRs | labels from branch/files/title; title must be a Conventional Commit |
 
 Architecture, with diagrams of the gateway, events and auth: [docs/](docs/README.md).
