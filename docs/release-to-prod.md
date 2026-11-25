@@ -88,10 +88,10 @@ Every task gets its env from Vault (`kv_nomad/ghentcdh/annophis`):
 |---|---|
 | `DATABASE_URL` per service | `postgresql://<svc_u>:…@<pg-host>:5432/annophis?schema=<svc_u>`. Use one Vault key per service, e.g. `MS_PROJECTS_DATABASE_URL`, mapped in that task's template. |
 | `NATS_URL` | `nats://{{ env "NOMAD_ADDR_nats" }}` |
-| `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID` | `https://auth.ghentcdh.ugent.be`, `annophis` |
+| `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID` | gateway only; `https://auth.ghentcdh.ugent.be`, `annophis` |
 | `KEYCLOAK_CLIENT_SECRET`, `KEYCLOAK_CALLBACK_URL`, `CROUTON_FRONTEND_URL` | gateway only; production URLs |
-| `CROUTON_AUTH_SECRET` | one long random value, the same for **all** backends |
-| `INTERNAL_JWT_SECRET`, `SERVICE_API_KEYS` | real values, with `SERVICE_AUTH` on |
+| `CROUTON_AUTH_SECRET` | gateway only; verifies the crouton session and mints `X-Internal-Token` |
+| `INTERNAL_JWT_SECRET`, `SERVICE_API_KEYS` | all backends, with `SERVICE_AUTH` on |
 | `SERVICE_NAME`, `BACKEND_PORT` | per task, can live in the job template itself |
 
 ## Releases, migrations and rollback
@@ -103,7 +103,7 @@ Every task gets its env from Vault (`kv_nomad/ghentcdh/annophis`):
 
 ## Who can reach what
 
-- The **admin UI is the gateway**, and the admin writes straight to the databases. It is protected by the Keycloak `admin` role. For `prd`, also decide whether to restrict the vhost to the UGent network or VPN, as other internal GhentCDH tools do.
+- The **admin UI is the gateway**, and the admin writes straight to the databases. It is protected by the Keycloak `admin` role at the gateway; services require that role in the `X-Internal-Token`. For `prd`, also decide whether to restrict the vhost to the UGent network or VPN, as other internal GhentCDH tools do.
 - Services, NATS and the migrate task have no load-balancer service, so they're only reachable inside the group.
 - Health: the Nomad service check calls the gateway's `GET /api/health/services`. It returns 200 only when the gateway and every service are up and connected to NATS, and 503 otherwise.
 

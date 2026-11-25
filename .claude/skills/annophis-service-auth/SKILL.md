@@ -7,7 +7,7 @@ description: How Annophis backends authenticate callers (gateway JWT, service AP
 
 `ServiceAuthGuard` (`@annophis/service-auth`) protects the **domain REST API** of a service. Put `@UseGuards(ServiceAuthGuard)` on every domain controller; `AnnophisServiceModule` provides the guard. Inside a guarded controller, mark exceptions with `@Public()`.
 
-It is deliberately not global. Crouton's own routes (admin CRUD, `/_app/auth/*`) are protected by crouton auth: Keycloak, shared `CROUTON_AUTH_SECRET` session tokens, and the `admin` guard in `auth-providers/keycloak/auth-provider.json`.
+It is deliberately not global. Crouton's own routes (admin CRUD) are protected by `InternalAdminGuard`, enabled through the `security` option of `CroutonApiModule`: `security: { default: { guard: 'admin' }, guards: { admin: InternalAdminGuard } }`. Only the gateway has a Keycloak auth-provider; it mints the `X-Internal-Token` that this guard verifies.
 
 | Caller | Sends | Accepted when |
 |---|---|---|
@@ -16,7 +16,7 @@ It is deliberately not global. Crouton's own routes (admin CRUD, `/_app/auth/*`)
 | Anyone | nothing | route has `@Public()` (e.g. `/health`) |
 
 - The result is on `req.caller`: either `{ type: 'service' }` or `{ type: 'user', userId, email, roles }`.
-- `Authorization` is the crouton session (for crouton routes); never read user identity from it in domain code. Use `req.caller`.
+- `Authorization` is the crouton session and is only for the gateway's own crouton routes; never read user identity from it in service code. Use `req.caller`.
 - `SERVICE_AUTH=on` is the default. `off` disables the check for quick local experiments; never use it in production.
 - Any verification failure is a 401. A token for another service is rejected (audience check).
 - Browsers never talk to services directly. They go through the gateway (`/api/<svc>/*`), which mints the internal token from the user's crouton session (`apps/gateway/crouton-backend/src/internal-token.middleware.ts`).

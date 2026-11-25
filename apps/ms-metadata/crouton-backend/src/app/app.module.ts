@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CroutonApiModule } from '@ghentcdh/crouton-api';
 
+import { InternalAdminGuard } from '@annophis/service-auth';
 import { AnnophisServiceModule } from '@annophis/service-kit';
 import { resolve } from 'node:path';
 
@@ -14,6 +15,11 @@ import { resolve } from 'node:path';
       {
         // served to the gateway's single admin UI under /ms-metadata (gateway proxy strips the prefix)
         baseUrl: '/ms-metadata',
+        // crouton CRUD is admin-only; the gateway's X-Internal-Token replaces the old keycloak auth-provider
+        security: {
+          default: { guard: 'admin' },
+          guards: { admin: InternalAdminGuard },
+        },
       },
     ),
     // after ConfigModule: needs SERVICE_NAME; adds EventBus, /health, /hello (ServiceAuthGuard is opt-in)

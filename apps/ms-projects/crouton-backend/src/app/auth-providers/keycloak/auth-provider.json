@@ -1,9 +1,0 @@
-{
-  "name": "Keycloak",
-  "provider": "keycloak",
-  "default": true,
-  "guards": {
-    "admin": ["admin"]
-  },
-  "defaultSecurity": { "guard": "admin" }
-}

@@ -87,8 +87,6 @@ COPY --from=build /app/generated/ml-adapter/default/types ./node_modules/@ml-ada
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ml-adapter/crouton.json apps/ml-adapter/crouton.enums.json ./
-# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
-COPY apps/ml-adapter/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
 COPY apps/ml-adapter/prisma ./prisma
 
 EXPOSE 3000

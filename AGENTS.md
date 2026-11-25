@@ -51,15 +51,15 @@ Use the `annophis-lib` skill to pick the right lib kind.
 ## Admin UIs (internal only)
 
 - **One admin UI:** `http://localhost:6200` (the gateway's crouton frontend) is the only frontend. Services have no frontend of their own.
-- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. Every backend accepts it (shared `CROUTON_AUTH_SECRET`) and requires the `admin` realm role (`auth-providers/keycloak/auth-provider.json`, `defaultSecurity`). The OIDC `state` for that redirect lives in an `express-session` stored in Postgres (`gateway.session`), so several gateway replicas can share it.
+- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. The gateway is the only service with an auth-provider; it mints a short-lived `X-Internal-Token` for each proxied request. Every service's crouton CRUD routes use `InternalAdminGuard` (configured via `CroutonApiModule`'s `security` option) to verify that token and require the `admin` role. The OIDC `state` for that redirect lives in an `express-session` stored in Postgres (`gateway.session`), so several gateway replicas can share it.
 - **Gateway facade** (`apps/gateway/crouton-backend/src/admin-facade.ts`):
   - `GET /_app/layout` merges the gateway's sidebar with one group per service. Leaf ids become `<svc>.<id>` and routes `<svc>/<route>` (`merge-layouts.ts`); services are listed only for admins.
-  - `/<svc>/*` is reverse-proxied to that service with the prefix stripped and `Authorization` forwarded.
+  - `/<svc>/*` is reverse-proxied to that service with the prefix stripped. `Authorization` stays for the gateway's own crouton routes; a fresh `X-Internal-Token` (aud = the service, roles from the session) is attached for the service's admin and domain guards.
   - Each service sets `baseUrl: '/<svc>'` in `CroutonApiModule.forResourceDir`, so its CRUD/relation URIs carry the prefix.
   - The service list (name, sidebar title, port) lives in `apps/gateway/crouton-backend/src/services.ts`. URLs come from `ANNOPHIS_<SVC>_URL`, else `localhost:<port>`.
   - `GET /health/services` gives the health of the whole stack (503 when any service is down or off the bus).
 - **Not public:** admin writes go straight to the database (events come from the Prisma extension, not controllers), so never expose the admin UIs publicly.
-- **Keycloak hostname:** `KEYCLOAK_URL=http://keycloak.localhost:6480` everywhere. `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer is the same for all of them.
+- **Keycloak hostname:** set `KEYCLOAK_URL=http://keycloak.localhost:6480` on the gateway (the only service that talks to Keycloak). `*.localhost` is loopback for browsers and Node, and Keycloak has that network alias inside Docker, so the token issuer matches what the browser sees.
 
 ## Commands
 
@@ -103,7 +103,7 @@ Plain markdown; any agent can read them.
 | `@annophis/domain-types` | shared | Zod primitives: `TextUrn`, `TextSelector` (NFC code points), W3C `Annotation` |
 | `@annophis/contracts` | shared | REST DTOs and event schemas per service; the single source of truth |
 | `@annophis/events` | backend | `EventBus` (NATS JetStream); `withEntityEvents()`, which writes every change's event to the transactional outbox; the outbox relay |
-| `@annophis/service-auth` | backend | `ServiceAuthGuard`, `@Public()` |
+| `@annophis/service-auth` | backend | `ServiceAuthGuard`, `InternalAdminGuard`, `@Public()` |
 | `@annophis/service-kit` | backend | `AnnophisServiceModule.forRoot(...)`: EventBus, `/health`, `/hello`, global guard |
 | `@annophis/testing` | backend | `createEventBusMock()` and other test helpers |
 

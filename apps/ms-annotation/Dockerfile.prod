@@ -87,8 +87,6 @@ COPY --from=build /app/generated/ms-annotation/default/types ./node_modules/@ms-
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ms-annotation/crouton.json apps/ms-annotation/crouton.enums.json ./
-# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
-COPY apps/ms-annotation/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
 COPY apps/ms-annotation/prisma ./prisma
 
 EXPOSE 3000
