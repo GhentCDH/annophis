@@ -3,6 +3,9 @@ FROM node:24-alpine
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
 ENV CI=true
+# pnpm store on the same volume as node_modules (the compose anonymous volume): hard links work, and a reinstall
+# at start (lockfile changed) reuses the store instead of copying every package (GhentCDH/crouton#694)
+ENV npm_config_store_dir=/app/node_modules/.pnpm-store
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --parents apps/ms-corpora/*/package.json generated/ms-corpora/default/types/package.json ./

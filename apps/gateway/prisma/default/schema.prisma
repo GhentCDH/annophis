@@ -26,3 +26,14 @@ model Outbox {
   @@index([publishedAt, createdAt])
   @@map("outbox")
 }
+
+/// Login sessions of the gateway (express-session via connect-pg-simple; only used during the Keycloak redirect).
+/// Shape required by connect-pg-simple. Internal: excluded from crouton (data-source.json).
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("session")
+}

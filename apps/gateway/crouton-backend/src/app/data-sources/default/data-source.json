@@ -9,6 +9,7 @@
   "clientOutput": "../../generated/gateway/default/client",
   "prismaConfig": "prisma/default/prisma.config.ts",
   "excludeTables": [
-    "outbox"
+    "outbox",
+    "session"
   ]
 }

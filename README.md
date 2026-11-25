@@ -49,7 +49,7 @@ for d in apps/*/; do [ -f "$d.env" ] || cp "$d.env.example" "$d.env"; done   # f
 pnpm dev
 ```
 
-Docker reads each `apps/<svc>/.env.example` (committed dev defaults), optionally overridden by `apps/<svc>/.env`.
+The dev containers keep the pnpm store inside their `node_modules` volume, so a reinstall after a dependency change reuses it instead of copying everything again. Docker reads each `apps/<svc>/.env.example` (committed dev defaults), optionally overridden by `apps/<svc>/.env`.
 
 Postgres reads its init files only on an empty volume. To reset: `docker compose down && rm -rf var`. Keycloak keeps no data: it re-imports `docker/keycloak/annophis-realm.json` on every start, so export console changes (below) or they are lost.
 
