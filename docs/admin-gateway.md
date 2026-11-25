@@ -43,7 +43,7 @@ sequenceDiagram
   UI->>GW: GET /api/_app/auth
   GW-->>UI: one provider: keycloak (server login)
   UI->>GW: GET /api/_app/auth/keycloak/login
-  GW-->>U: 302 to Keycloak (state kept in express-session)
+  GW-->>U: 302 to Keycloak (OIDC state in the session, stored in Postgres gateway.session)
   U->>KC: username + password
   KC-->>U: 302 /api/_app/auth/keycloak/callback?code=…
   U->>GW: callback with code

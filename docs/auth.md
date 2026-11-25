@@ -19,7 +19,7 @@ flowchart TB
 
 ## Admin access
 - Users and roles live in the Keycloak realm `annophis` (`docker/keycloak/annophis-realm.json`). The dev users are `admin`/`admin` (roles admin, editor, viewer) and `viewer`/`viewer`.
-- The gateway does a **server-side login** with the confidential client `annophis-gateway` and issues a crouton session JWT. Every backend shares `CROUTON_AUTH_SECRET`, so every backend accepts it.
+- The gateway does a **server-side login** with the confidential client `annophis-gateway` and issues a crouton session JWT. The OIDC `state` during the redirect lives in an `express-session` stored in Postgres (`gateway.session`, Prisma model `Session`), so several gateway instances can share it. Every backend shares `CROUTON_AUTH_SECRET`, so every backend accepts it.
 - Each project's `auth-providers/keycloak/auth-provider.json` requires the `admin` realm role on all crouton routes. A user without it is refused by every service (403), and the merged sidebar shows no service groups.
 
 ## Service-to-service and domain APIs

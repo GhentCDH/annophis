@@ -51,7 +51,7 @@ Use the `annophis-lib` skill to pick the right lib kind.
 ## Admin UIs (internal only)
 
 - **One admin UI:** `http://localhost:6200` (the gateway's crouton frontend) is the only frontend. Services have no frontend of their own.
-- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. Every backend accepts it (shared `CROUTON_AUTH_SECRET`) and requires the `admin` realm role (`auth-providers/keycloak/auth-provider.json`, `defaultSecurity`).
+- **Login:** one Keycloak login at the gateway (server-side flow, confidential `annophis-gateway` client) gives a crouton session token. Every backend accepts it (shared `CROUTON_AUTH_SECRET`) and requires the `admin` realm role (`auth-providers/keycloak/auth-provider.json`, `defaultSecurity`). The OIDC `state` for that redirect lives in an `express-session` stored in Postgres (`gateway.session`), so several gateway replicas can share it.
 - **Gateway facade** (`apps/gateway/crouton-backend/src/admin-facade.ts`):
   - `GET /_app/layout` merges the gateway's sidebar with one group per service. Leaf ids become `<svc>.<id>` and routes `<svc>/<route>` (`merge-layouts.ts`); services are listed only for admins.
   - `/<svc>/*` is reverse-proxied to that service with the prefix stripped and `Authorization` forwarded.

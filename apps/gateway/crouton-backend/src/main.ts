@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import connectPgSimple from 'connect-pg-simple';
 import session from 'express-session';
 
 import { applyResourceTagDescriptions } from '@ghentcdh/crouton-api';
@@ -15,9 +16,15 @@ const bootstrap = async () => {
   app.enableCors();
   // Server-side Keycloak login (crouton → passport-openidconnect) keeps the OAuth `state` in req.session and
   // fails with a bare 500 without it. Only used during the login redirect; the login result is a crouton JWT.
-  // ponytail: in-memory store, fine for one gateway instance; use a shared store (e.g. Postgres) when scaled out.
+  // Stored in Postgres (table gateway.session, Prisma model Session + migration), so gateway instances share it.
+  const PgSession = connectPgSimple(session);
   app.use(
     session({
+      store: new PgSession({
+        conString: process.env.DATABASE_URL?.replace(/[?&]schema=[^&]*/, ''),
+        schemaName: 'gateway',
+        pruneSessionInterval: 15 * 60,
+      }),
       secret: process.env.CROUTON_AUTH_SECRET ?? '',
       resave: false,
       saveUninitialized: false,
