@@ -87,8 +87,6 @@ COPY --from=build /app/generated/text-service-2/default/types ./node_modules/@te
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/text-service-2/crouton.json apps/text-service-2/crouton.enums.json ./
-# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
-COPY apps/text-service-2/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
 COPY apps/text-service-2/prisma ./prisma
 
 EXPOSE 3000

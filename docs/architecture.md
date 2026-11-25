@@ -53,7 +53,7 @@ flowchart TB
     crouton["CroutonApiModule<br/>resources → REST CRUD + admin schemas<br/>baseUrl '/#lt;svc#gt;'"]
     kit["AnnophisServiceModule.forRoot()<br/>EventBus · /health · /hello"]
     ds["data source<br/>withEntityEvents(PrismaClient, '#lt;svc#gt;')"]
-    auth["auth-providers/keycloak<br/>admin role required"]
+    auth["InternalAdminGuard<br/>via CroutonApiModule security<br/>admin role required"]
   end
   crouton --> ds
   ds -->|"writes → events"| kit
@@ -64,6 +64,7 @@ flowchart TB
 | Piece | Where | Purpose |
 |---|---|---|
 | crouton resources | `crouton-backend/src/app/resources/*/resource.json` | REST CRUD + the admin UI definition, generated from Prisma |
+| admin guard | `app.module.ts` → `CroutonApiModule` `security` option | `InternalAdminGuard` verifies the gateway's `X-Internal-Token` and requires `admin` |
 | data source | `crouton-backend/src/app/data-sources/default/index.ts` | the Prisma client, wrapped with `withEntityEvents` |
 | service kit | `@annophis/service-kit` | event bus, `/health`, `/hello` |
 | contracts | `@annophis/contracts` | Zod schemas for DTOs and events: the single source of truth |

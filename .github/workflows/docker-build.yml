@@ -145,7 +145,7 @@ jobs:
           curl -sf http://localhost:6200/api/health/services | tee /tmp/health.json | jq -e '.status == "ok" and (.services | length) == 8'
           check / 200
           check /config.json 200
-          check /api/ms-projects/project 403          # crouton admin guard (auth providers present)
+          check /api/ms-projects/project 401          # InternalAdminGuard (no internal token)
           check /api/ms-projects/hello 401            # ServiceAuthGuard
           check /api/_app/auth/keycloak/login 302     # Keycloak server login
 

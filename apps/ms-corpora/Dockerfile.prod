@@ -87,8 +87,6 @@ COPY --from=build /app/generated/ms-corpora/default/types ./node_modules/@ms-cor
 
 # Crouton config (runtime: CroutonApiModule.forResourceDir looks for crouton.json)
 COPY apps/ms-corpora/crouton.json apps/ms-corpora/crouton.enums.json ./
-# crouton.json → authProvidersDir: without this folder crouton disables auth (admin guard!)
-COPY apps/ms-corpora/crouton-backend/src/app/auth-providers ./crouton-backend/src/app/auth-providers
 COPY apps/ms-corpora/prisma ./prisma
 
 EXPOSE 3000

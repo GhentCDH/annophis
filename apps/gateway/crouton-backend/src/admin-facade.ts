@@ -17,8 +17,8 @@ type Next = (err?: unknown) => void;
  * Presents every service as one crouton backend, so the gateway's single admin UI covers them all:
  * - GET /_app/layout: the gateway's own sidebar plus one group per service (admins only);
  * - /<svc>/*: reverse proxy to that service (prefix stripped). Authorization (crouton session) is forwarded, so each
- *   service still enforces its own `admin` guard on crouton routes, and an internal token (X-Internal-Token) for
- *   that service is attached for its ServiceAuthGuard-protected domain routes.
+ *   service can ignore it; an internal token (X-Internal-Token) for that service is attached and its
+ *   InternalAdminGuard/ServiceAuthGuard verify it.
  * Express middleware registered before Nest's router, so it takes /_app/layout over from crouton.
  */
 export const mountAdminFacade = (app: INestApplication, port: number | string) => {

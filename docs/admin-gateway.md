@@ -29,7 +29,7 @@ flowchart LR
 
 ## Logging in
 
-One login at the gateway gives a **crouton session token** (a JWT signed with `CROUTON_AUTH_SECRET`). Every backend shares that secret, so the same token works for all services.
+One login at the gateway gives a **crouton session token** (a JWT signed with `CROUTON_AUTH_SECRET`). Only the gateway keeps that secret. When it proxies a request, it mints a short-lived `X-Internal-Token` for the target service; the services verify that token instead of the session.
 
 ```mermaid
 sequenceDiagram
@@ -105,11 +105,11 @@ sequenceDiagram
   participant DB as Postgres (ms_projects)
 
   UI->>GW: GET /api/ms-projects/project/schemas
-  GW->>P: GET /project/schemas (proxy, Bearer forwarded)
+  GW->>P: GET /project/schemas (proxy, X-Internal-Token attached)
   P-->>UI: schemas with operation URIs /ms-projects/project…
   UI->>GW: POST /api/ms-projects/project
   GW->>P: POST /project
-  P->>P: admin guard (crouton token, realm role admin)
+  P->>P: InternalAdminGuard (X-Internal-Token, role admin)
   P->>DB: insert (Prisma + entity events)
   P-->>UI: 201 Created
 ```
@@ -117,7 +117,7 @@ sequenceDiagram
 Because each service sets `baseUrl: '/<svc>'`, the URIs it puts in its schemas already carry the prefix. The UI just calls them under `/api`.
 
 ## Adding a service to the admin UI
-1. In the service's `app.module.ts`: `CroutonApiModule.forResourceDir(..., { baseUrl: '/<svc>' })`.
+1. In the service's `app.module.ts`: `CroutonApiModule.forResourceDir(..., { baseUrl: '/<svc>', security: { default: { guard: 'admin' }, guards: { admin: InternalAdminGuard } } })`.
 2. In `apps/gateway/crouton-backend/src/services.ts`: add `{ name, title, port }`.
 
 The `annophis-add-service` skill has the full checklist.
@@ -125,5 +125,5 @@ The `annophis-add-service` skill has the full checklist.
 ## Limits (by design, for now)
 - One `isDev`/language setting for the whole UI, the gateway's.
 - No relations *between* services in the admin. Relations inside one service work.
-- The admin writes straight to the databases, so **never expose it publicly**. It needs the Keycloak `admin` role.
+- The admin writes straight to the databases, so **never expose it publicly**. It needs the Keycloak `admin` role at the gateway; services enforce that role in the `X-Internal-Token`.
 - A crouton feature, "multi-backend frontend" (one crouton context per route subtree), would make this facade unnecessary.

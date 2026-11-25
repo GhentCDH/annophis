@@ -38,3 +38,14 @@ test.describe('domain routes are protected by ServiceAuthGuard', () => {
     expect((await request.get(`${msProjects}/health`)).status()).toBe(200);
   });
 });
+
+test.describe('crouton CRUD is protected by InternalAdminGuard', () => {
+  test('calling a service CRUD directly without credentials is refused', async ({ request }) => {
+    expect((await request.get(`${msProjects}/project`)).status()).toBe(401);
+  });
+
+  test('a service API key is not enough for admin CRUD', async ({ request }) => {
+    const res = await request.get(`${msProjects}/project`, { headers: { 'X-Api-Key': 'dev-key-gateway' } });
+    expect(res.status()).toBe(401);
+  });
+});

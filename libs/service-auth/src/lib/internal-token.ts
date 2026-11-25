@@ -1,4 +1,5 @@
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
+import type { JWTPayload } from 'jose';
 
 export const INTERNAL_JWT_ISSUER = 'annophis-gateway';
 /** Header carrying the gateway-issued token; `Authorization` stays free for crouton's session token. */
@@ -24,3 +25,16 @@ export const signInternalToken = (
     .setIssuedAt()
     .setExpirationTime(ttl)
     .sign(new TextEncoder().encode(secret));
+
+/**
+ * Verifies the gateway-issued internal token for `audience` (the service's SERVICE_NAME) and returns its claims.
+ * Throws when the signature, issuer, audience, algorithm or expiry is wrong.
+ */
+export const verifyInternalToken = async (token: string, audience: string, secret: string): Promise<JWTPayload> => {
+  const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), {
+    issuer: INTERNAL_JWT_ISSUER,
+    audience,
+    algorithms: ['HS256'],
+  });
+  return payload;
+};

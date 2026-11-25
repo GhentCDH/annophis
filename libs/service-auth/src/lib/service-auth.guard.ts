@@ -1,9 +1,8 @@
 import { Inject, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common';
 import type { CanActivate, CustomDecorator, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { jwtVerify } from 'jose';
 
-import { INTERNAL_JWT_ISSUER, INTERNAL_TOKEN_HEADER } from './internal-token';
+import { INTERNAL_TOKEN_HEADER, verifyInternalToken } from './internal-token';
 
 const PUBLIC = 'annophis:public';
 /** Marks a route as reachable without service auth (e.g. /health). */
@@ -40,11 +39,7 @@ export class ServiceAuthGuard implements CanActivate {
     const secret = process.env['INTERNAL_JWT_SECRET'];
     if (typeof token !== 'string' || !secret) throw new UnauthorizedException();
     try {
-      const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), {
-        issuer: INTERNAL_JWT_ISSUER,
-        audience: process.env['SERVICE_NAME'],
-        algorithms: ['HS256'],
-      });
+      const payload = await verifyInternalToken(token, process.env['SERVICE_NAME'] ?? '', secret);
       req.caller = {
         ...payload,
         type: 'user',

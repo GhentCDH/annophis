@@ -86,11 +86,11 @@ job "[[ job_name ]]" {
         SERVICE_API_KEY={{ index .Data.data "[[ app.env ]]_API_KEY" }}
         SERVICE_API_KEYS={{ .Data.data.SERVICE_API_KEYS }}
         SERVICE_AUTH=on
-        CROUTON_AUTH_SECRET={{ .Data.data.CROUTON_AUTH_SECRET }}
         INTERNAL_JWT_SECRET={{ .Data.data.INTERNAL_JWT_SECRET }}
+        [%- if app.name == "gateway" %]
+        CROUTON_AUTH_SECRET={{ .Data.data.CROUTON_AUTH_SECRET }}
         KEYCLOAK_URL={{ .Data.data.KEYCLOAK_URL }}
         KEYCLOAK_REALM={{ .Data.data.KEYCLOAK_REALM }}
-        [%- if app.name == "gateway" %]
         KEYCLOAK_CLIENT_ID=annophis-gateway
         KEYCLOAK_CLIENT_SECRET={{ .Data.data.GATEWAY_KEYCLOAK_CLIENT_SECRET }}
         KEYCLOAK_CALLBACK_URL=https://[[ fqdn ]]/api/_app/auth/keycloak/callback
@@ -98,8 +98,6 @@ job "[[ job_name ]]" {
         [%- for svc in apps if svc.name != "gateway" %]
         ANNOPHIS_[[ svc.env ]]_URL=http://127.0.0.1:[[ svc.port ]]
         [%- endfor %]
-        [%- else %]
-        KEYCLOAK_CLIENT_ID=annophis-ui
         [%- endif %]
         {{ end }}
         EOH
