@@ -149,6 +149,16 @@ jobs:
           check /api/ms-projects/hello 401            # ServiceAuthGuard
           check /api/_app/auth/keycloak/login 302     # Keycloak server login
 
+      - name: Diagnose
+        if: failure()
+        run: |
+          docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example ps
+          echo "--- /health/services through the gateway (host port) ---"
+          curl -s http://localhost:6200/api/health/services || echo "(unreachable)"
+          echo
+          echo "--- /health/services inside the gateway container ---"
+          docker exec annophis-smoke-gateway-1 wget -qO- http://localhost:3000/health/services || echo "(unreachable)"
+
       - name: Logs
         if: failure()
         run: docker compose -p annophis-smoke -f compose.prod.yml -f compose.prod.smoke.yml --env-file .env.prod.example logs --tail 80
