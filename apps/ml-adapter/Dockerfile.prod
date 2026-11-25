@@ -61,7 +61,8 @@ RUN mkdir -p /app/generated/ml-adapter/default/types/src && find /app/generated/
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
     && find /app/generated/ml-adapter/default/types/src -name '*.ts' -delete \
-    && sed -i 's/index\.ts/index.js/g' /app/generated/ml-adapter/default/types/package.json
+    && sed -i 's/index\.ts/index.js/g' /app/generated/ml-adapter/default/types/package.json \
+    && grep -rl 'client/index' /app/generated/ml-adapter/default/types/src | while read f; do sed -i 's#\.\./\.\./\.\./client/index#@ml-adapter/generated-default-client#g' "$f"; sed -i 's#\.\./\.\./client/index#@ml-adapter/generated-default-client#g' "$f"; done
 
 # ========================================================
 # Stage 3: Production

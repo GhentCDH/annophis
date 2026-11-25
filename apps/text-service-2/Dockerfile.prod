@@ -61,7 +61,8 @@ RUN mkdir -p /app/generated/text-service-2/default/types/src && find /app/genera
         npx esbuild "$f" --outfile="${f%.ts}.js" --platform=node --format=cjs --target=node22; \
       done \
     && find /app/generated/text-service-2/default/types/src -name '*.ts' -delete \
-    && sed -i 's/index\.ts/index.js/g' /app/generated/text-service-2/default/types/package.json
+    && sed -i 's/index\.ts/index.js/g' /app/generated/text-service-2/default/types/package.json \
+    && grep -rl 'client/index' /app/generated/text-service-2/default/types/src | while read f; do sed -i 's#\.\./\.\./\.\./client/index#@text-service-2/generated-default-client#g' "$f"; sed -i 's#\.\./\.\./client/index#@text-service-2/generated-default-client#g' "$f"; done
 
 # ========================================================
 # Stage 3: Production

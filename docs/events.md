@@ -5,27 +5,29 @@ Services never read each other's databases. They react to **events** on NATS Jet
 - **Stream:** `ANNOPHIS`, subjects `annophis.<type>`.
 - **Code:** `@annophis/events` (`EventBus`, `withEntityEvents`) and `@annophis/contracts` (event schemas).
 
-## Entity events: every write announces itself
+## Entity events: every write announces itself (transactional outbox)
 
-Each service wraps its Prisma client: `withEntityEvents(new PrismaClient(...), '<svc>')`. **Every** successful write then publishes an event, including writes made through the admin UI, so controllers never publish entity events themselves.
+Each service wraps its Prisma client: `withEntityEvents(new PrismaClient(...), '<svc>')`. **Every** successful write, including those made through the admin UI, stores its event in the service's `outbox` table **in the same database transaction**. The `OutboxRelay` (part of `AnnophisServiceModule`) then publishes it to NATS. Controllers never publish entity events themselves.
 
 ```mermaid
 sequenceDiagram
   autonumber
   participant A as admin UI / REST client
   participant S as ms-projects
-  participant X as Prisma + entity-events extension
-  participant DB as Postgres
+  participant X as Prisma + withEntityEvents
+  participant DB as Postgres (ms_projects)
+  participant R as OutboxRelay (every 500 ms)
   participant N as NATS JetStream (ANNOPHIS)
   participant O as other services
 
   A->>S: POST /project
   S->>X: project.create(...)
-  X->>DB: INSERT
-  DB-->>X: row
-  X--)N: publish annophis.ms-projects.project.created<br/>(data = row, subject = id)
+  X->>DB: BEGIN · INSERT project · INSERT outbox · COMMIT
   X-->>S: row
   S-->>A: 201
+  R->>DB: oldest unpublished outbox rows
+  R--)N: publish annophis.ms-projects.project.created<br/>(event id = outbox id → msgID dedupe)
+  R->>DB: mark published
   N--)O: deliver to durable consumers
 ```
 
@@ -36,9 +38,14 @@ sequenceDiagram
 | `delete` | `<svc>.<model>.deleted` | the deleted row |
 | `createMany` / `updateMany` / `deleteMany` | same verbs | `{ count, where }` |
 
-Each event is wrapped in an envelope `{ id, type, source, time, subject, dataVersion, data }`, validated by `EntityChangedEvent` in `@annophis/contracts`.
+Each event is wrapped in an envelope `{ id, type, source, time, subject, dataVersion, data }` (validated by `EntityChangedEvent` in `@annophis/contracts`). `id` is the outbox row id and `time` its creation time.
 
-**Delivery is fire-and-forget after the write.** A NATS outage is logged and drops the event, but never fails the write. Inside an interactive transaction an event can precede the commit. Switch to a transactional outbox when that matters.
+**Delivery guarantees:**
+- **An event exists if and only if the change is committed.** A failed write leaves no event, and a committed write always has one.
+- **A NATS outage doesn't lose events.** Writes keep working, and rows wait in the outbox until NATS is back. Tested: a project created with NATS stopped was published within seconds of NATS restarting.
+- **At least once, in order per service.** A re-published event has the same id, so JetStream drops duplicates within its dedupe window, and consumers dedupe on `event.id`.
+- **Caveat:** a write inside a caller's own interactive transaction (`$transaction(async tx => …)`) runs in a separate transaction, so it is not atomic with the caller's other statements.
+- **Outbox table:** every service's Prisma schema has `model Outbox` (table `outbox`), excluded from crouton via `excludeTables` in `data-source.json`. `OUTBOX_RELAY_INTERVAL_MS` sets the polling interval (default 500).
 
 ## Subscribing
 

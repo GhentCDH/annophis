@@ -43,7 +43,7 @@ Use the `annophis-lib` skill to pick the right lib kind.
 
 - **Service boundaries.** A service owns its Postgres schema (`?schema=<svc>`). It never reads another service's schema. Services talk to each other via REST or bus events only.
 - **Contracts are the single source of truth.** REST DTOs and event schemas (Zod) live in `libs/contracts/<svc>/`. Every schema has fixture payloads in a test.
-- **Admin writes go through Prisma.** Events are emitted from the Prisma client extension in `libs/events`, not from controllers, so admin CRUD also produces events.
+- **Admin writes go through Prisma.** Every write stores its event in the service's `outbox` table in the same transaction (`withEntityEvents` in `libs/events`), and the outbox relay publishes it. Controllers never publish entity events, and admin CRUD produces events too.
 - **The admin UIs are internal tools.** They sit behind Keycloak with the `admin` role and are never exposed publicly.
 - Code style: TypeScript strict, `type` over `interface`, arrow functions, `import type` for type-only imports.
 - Commit messages follow Conventional Commits.
@@ -102,7 +102,7 @@ Plain markdown; any agent can read them.
 |---|---|---|
 | `@annophis/domain-types` | shared | Zod primitives: `TextUrn`, `TextSelector` (NFC code points), W3C `Annotation` |
 | `@annophis/contracts` | shared | REST DTOs and event schemas per service; the single source of truth |
-| `@annophis/events` | backend | `EventBus` (NATS JetStream) and `withEntityEvents()`, the Prisma extension that emits `<svc>.<model>.<verb>` on every write |
+| `@annophis/events` | backend | `EventBus` (NATS JetStream); `withEntityEvents()`, which writes every change's event to the transactional outbox; the outbox relay |
 | `@annophis/service-auth` | backend | `ServiceAuthGuard`, `@Public()` |
 | `@annophis/service-kit` | backend | `AnnophisServiceModule.forRoot(...)`: EventBus, `/health`, `/hello`, global guard |
 | `@annophis/testing` | backend | `createEventBusMock()` and other test helpers |

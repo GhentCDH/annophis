@@ -1,7 +1,7 @@
 import { Controller, Get, Global, Inject, Injectable, Logger, Module, Req, UseGuards } from '@nestjs/common';
-import type { DynamicModule, OnApplicationBootstrap } from '@nestjs/common';
+import type { DynamicModule, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 
-import { EVENTS_OPTIONS, EventBus } from '@annophis/events';
+import { EVENTS_OPTIONS, EventBus, getOutboxStore, relayOutbox } from '@annophis/events';
 import type { EventsOptions } from '@annophis/events';
 import { Public, ServiceAuthGuard } from '@annophis/service-auth';
 import type { Caller } from '@annophis/service-auth';
@@ -48,9 +48,49 @@ class HelloListener implements OnApplicationBootstrap {
 }
 
 /**
+ * Publishes the service's transactional outbox (rows written by withEntityEvents) to NATS, every
+ * OUTBOX_RELAY_INTERVAL_MS (default 500 ms). Rows stay pending while NATS is down and go out once it is back.
+ */
+@Injectable()
+class OutboxRelay implements OnApplicationBootstrap, OnModuleDestroy {
+  private readonly log = new Logger('OutboxRelay');
+  private timer?: ReturnType<typeof setInterval>;
+  private running = false;
+
+  constructor(@Inject(EventBus) private readonly bus: EventBus) {}
+
+  onApplicationBootstrap() {
+    const store = getOutboxStore();
+    if (!store) {
+      this.log.warn('no outbox: the data source does not use withEntityEvents');
+      return;
+    }
+    const interval = Number(process.env['OUTBOX_RELAY_INTERVAL_MS'] ?? 500);
+    this.timer = setInterval(() => void this.tick(store.service, store.client), interval);
+  }
+
+  private async tick(service: string, client: { outbox: Parameters<typeof relayOutbox>[1] }) {
+    if (this.running) return;
+    this.running = true;
+    try {
+      const { pending } = await relayOutbox(service, client.outbox, (env) => this.bus.publishEnvelope(env));
+      if (pending) this.log.warn(`${pending} outbox event(s) not published yet (NATS unavailable?)`);
+    } catch (e) {
+      this.log.error(e);
+    } finally {
+      this.running = false;
+    }
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.timer);
+  }
+}
+
+/**
  * Wiring every Annophis backend imports once: `AnnophisServiceModule.forRoot()`.
  * The service name defaults to SERVICE_NAME; startup fails without one.
- * Provides the EventBus and /health + /hello. ServiceAuthGuard is opt-in per domain controller
+ * Provides the EventBus, the OutboxRelay and /health + /hello. ServiceAuthGuard is opt-in per domain controller
  * (`@UseGuards(ServiceAuthGuard)`): crouton's own CRUD and `/_app/auth/*` routes use crouton auth instead.
  */
 @Global()
@@ -67,6 +107,7 @@ export class AnnophisServiceModule {
         { provide: EVENTS_OPTIONS, useValue: o },
         EventBus,
         HelloListener,
+        OutboxRelay,
         ServiceAuthGuard,
       ],
       exports: [EventBus, ServiceAuthGuard],
